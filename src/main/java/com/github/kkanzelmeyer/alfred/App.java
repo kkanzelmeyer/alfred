@@ -3,6 +3,7 @@ package com.github.kkanzelmeyer.alfred;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.kkanzelmeyer.alfred.server.Config;
 import com.github.kkanzelmeyer.alfred.server.Server;
 
 /**
@@ -16,6 +17,6 @@ public class App
   public static void main(String[] args)
   {
     LOG.trace("Initializing Server");
-    Server.INSTANCE.init();
+    Config.INSTANCE.init();
   }
 }
