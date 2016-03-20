@@ -2,3 +2,4 @@ config.json
 target/
 .project
 .settings/
+.classpath
