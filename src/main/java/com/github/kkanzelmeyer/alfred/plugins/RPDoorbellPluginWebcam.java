@@ -92,7 +92,7 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
     // Raspberry pi handler
     if (Config.INSTANCE.getEnvironment().equals("production"))
     {
-      LOG.debug("Adding plugin for pin " + pin);
+      LOG.debug("Adding plugin for pin {}", pin);
       GpioController gpio = GpioFactory.getInstance();
       sensor = gpio.provisionDigitalInputPin(PinConverter.ModelB.fromInt(pin), "Input", PinPullResistance.PULL_DOWN);
       sensor.addListener(new DoorbellSensorHandler());
@@ -112,7 +112,7 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
   public void deactivate()
   {
     timer.cancel();
-    LOG.trace("Deactivating plugin " + CLASSNAME);
+    LOG.trace("Deactivating plugin {}", CLASSNAME);
     StateDeviceManager.INSTANCE.removeDeviceHandler(stateHandler);
     stateHandler = null;
   }
@@ -130,7 +130,7 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
     {
       if (event.getState() == PinState.HIGH)
       {
-        LOG.info(myDeviceId + " event detected : " + event.getState());
+        LOG.info("{} event detected : {}", myDeviceId, event.getState());
         StateDevice device = StateDeviceManager.INSTANCE.getDevice(myDeviceId);
         State newState;
         if (device.getState() != State.ACTIVE)
@@ -182,8 +182,7 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
       if (device.getId().equals(myDeviceId))
       {
 
-        LOG.info("Device updated" + device.toString());
-        LOG.debug("Updated device on thread " + Thread.currentThread().getId());
+        LOG.info("Device updated {}", device.toString());
 
         // if the state is being set to Active, take a picture
         // and let the callback finish sending the message
@@ -261,7 +260,7 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
           File directory = new File(Config.INSTANCE.getImageDir());
           File outputfile = new File(directory, filename);
           ImageIO.write(image, "jpg", outputfile);
-          LOG.debug("Image saved: " + outputfile.getAbsolutePath());
+          LOG.debug("Image saved: {}", outputfile.getAbsolutePath());
         }
         catch (IOException e)
         {
@@ -305,7 +304,7 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
       @Override
       public void run()
       {
-        LOG.info("Resetting " + mDevice.getName());
+        LOG.info("Resetting {}", mDevice.getName());
         StateDeviceManager.INSTANCE.updateStateDevice(mDevice.getId(), State.INACTIVE);
       }
     }

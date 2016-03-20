@@ -1,12 +1,10 @@
 package com.github.kkanzelmeyer.alfred.server;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +50,7 @@ public enum Config
       LOG.debug("Doorbell reset : {}", mDoorbellReset);
 
       JSONArray jsonNums = (JSONArray) json.get("numbers");
-      Iterator<String> iterator = jsonNums.iterator();
+      Iterator<?> iterator = jsonNums.iterator();
       while (iterator.hasNext())
       {
         String number = (String) iterator.next();
@@ -69,11 +67,6 @@ public enum Config
       LOG.error("Unable to load SAPS file", e);
     }
     LOG.debug("Finished loading saps");
-  }
-
-  public void init()
-  {
-
   }
 
   public String getImageDir()

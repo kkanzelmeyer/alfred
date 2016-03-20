@@ -25,8 +25,9 @@ public class WebcamPluginTest
   public void captureImage()
   {
     // count number of files in the image directory for later comparison
-    int oldLength = new File(Config.INSTANCE.getImageDir()).list().length;
-    LOG.debug("{} files are in {}", oldLength, Config.INSTANCE.getImageDir());
+    File imgDir = new File(Config.INSTANCE.getImageDir());
+    int oldLength = imgDir.list().length;
+    LOG.debug("{} files are in {}", oldLength, imgDir.getAbsolutePath());
     
     // create new device and add it to the data model
     LOG.debug("State Test");
@@ -49,16 +50,16 @@ public class WebcamPluginTest
     LOG.debug("Injecting new device state");
     StateDeviceManager.INSTANCE.updateStateDevice(doorbell.getId(), State.ACTIVE);
 
-    // wait a few seconds for the webcam to complete and for the device to
+    // Set the timeout to a low value for testing
+    Config.INSTANCE.setDoorbellReset(1000);
     // reset to INACTIVE
     try
     {
-      Thread.sleep(7000);
+      Thread.sleep(3000);
     }
     catch (InterruptedException e)
     {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOG.error("Problem sleeping", e);
     }
 
     // deactivate the plugin to cancel the timing thread

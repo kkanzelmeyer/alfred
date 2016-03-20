@@ -99,7 +99,7 @@ public enum StateDeviceManager
    */
   public void removeStateDevice(StateDevice device)
   {
-    LOG.trace("Removing device " + device.getName());
+    LOG.trace("Removing device {}", device.getName());
     deviceList.remove(device.getId());
     for (StateDeviceHandler handler : deviceHandlers)
     {
@@ -119,7 +119,7 @@ public enum StateDeviceManager
    */
   public void updateStateDevice(String id, State state)
   {
-    LOG.debug("Update state device called for " + id + " with state " + state);
+    LOG.debug("Update state device called for {} with state {}", id, state);
     if (deviceList.containsKey(id))
     {
       StateDevice updateDevice = getDevice(id);
@@ -155,7 +155,7 @@ public enum StateDeviceManager
   {
     if (!deviceHandlers.contains(handler))
     {
-      LOG.trace("Adding device handler " + handler.getClass().getSimpleName());
+      LOG.trace("Adding device handler {}", handler.getClass().getSimpleName());
       deviceHandlers.add(handler);
     }
   }
@@ -170,7 +170,7 @@ public enum StateDeviceManager
   {
     if (deviceHandlers.contains(handler))
     {
-      LOG.trace("Removing device handler " + handler.getClass().getSimpleName());
+      LOG.trace("Removing device handler {}", handler.getClass().getSimpleName());
       deviceHandlers.remove(handler);
     }
   }

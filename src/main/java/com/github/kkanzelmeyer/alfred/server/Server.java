@@ -37,7 +37,7 @@ public enum Server
     StateDeviceManager.INSTANCE.addStateDevice(doorbell);
     
     // initialize device plugin
-    new RPDoorbellPluginWebcam(12, doorbell.getId()).activate();
+    new RPDoorbellPluginWebcam(12, doorbell).activate();
 
   }
 
