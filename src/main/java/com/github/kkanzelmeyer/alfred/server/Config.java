@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.kkanzelmeyer.alfred.utils.ParseJsonFile;
+import com.twilio.sdk.TwilioRestClient;
 
 /**
  * @author kevin
@@ -25,6 +26,7 @@ public enum Config
   private ArrayList<String> mNumbers = null;
   private String mEnvironment = null;
   private int mDoorbellReset = 5;
+  private TwilioRestClient mClient = null;
   private final Logger LOG = LoggerFactory.getLogger(Config.class);
 
   private Config()
@@ -60,6 +62,12 @@ public enum Config
       LOG.debug("Finshed with json saps");
 
       mEnvironment = System.getenv("JAVA_ENV");
+      
+      // Create twilio obj
+      LOG.debug("Creating twilio client");
+      mClient = new TwilioRestClient(twilioSid, twilioToken);
+      
+      // TODO add twilio number to SAPS
 
     }
     catch (Exception e)
@@ -92,5 +100,9 @@ public enum Config
   public void setDoorbellReset(int val)
   {
     mDoorbellReset = val;
+  }
+  
+  public TwilioRestClient getTwilioClient() {
+    return mClient;
   }
 }

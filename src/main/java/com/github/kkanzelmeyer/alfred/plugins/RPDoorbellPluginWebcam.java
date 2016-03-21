@@ -27,6 +27,7 @@ import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import com.twilio.sdk.TwilioRestException;
 
 /**
  * Raspberry Pi Doorbell Plugin with Webcam option
@@ -261,19 +262,22 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
           File outputfile = new File(directory, filename);
           ImageIO.write(image, "jpg", outputfile);
           LOG.debug("Image saved: {}", outputfile.getAbsolutePath());
+          
+          // send texts
+          if (DEPLOYED)
+          {
+            Server.INSTANCE.sendTextAlert("Visitor Detected", outputfile.getAbsolutePath());
+          }
         }
         catch (IOException e)
         {
-          // TODO Auto-generated catch block
           LOG.error("Trouble saving image", e);
         }
-
-        // send texts
-        if (DEPLOYED)
+        catch (TwilioRestException e)
         {
-          // Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-          Server.INSTANCE.sendTextAlert();
+          LOG.error("Error sending text message", e);
         }
+
       }
     }
 

@@ -60,7 +60,7 @@
     <dependency>
       <groupId>com.github.sarxos</groupId>
       <artifactId>webcam-capture-driver-v4l4j</artifactId>
-      <version>0.3.11-SNAPSHOT</version>
+      <version>0.3.11</version>
     </dependency>
 
     <dependency>
