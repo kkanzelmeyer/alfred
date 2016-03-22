@@ -20,9 +20,9 @@ public class SapsTest
     LOG.debug("Printing SAPS");
     LOG.debug("Environment: {}", Config.INSTANCE.getEnvironment());
     LOG.debug("ImageDirectory: {}", Config.INSTANCE.getImageDir());
-    ArrayList<String> numbers = Config.INSTANCE.getNumbers();
-    for(String number : numbers) {
-      LOG.debug("Number: {}", number);
+    ArrayList<String> emails = Config.INSTANCE.getEmails();
+    for(String email : emails) {
+      LOG.debug("Email: {}", email);
     }
     LOG.debug("Doorbell Reset: {}", Config.INSTANCE.getDoorbellReset());
     assertEquals("Numbers should be equal", 120, Config.INSTANCE.getDoorbellReset());

@@ -18,7 +18,6 @@ import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceHandler;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceManager;
 import com.github.kkanzelmeyer.alfred.datamodel.enums.State;
 import com.github.kkanzelmeyer.alfred.server.Config;
-import com.github.kkanzelmeyer.alfred.server.Server;
 import com.github.kkanzelmeyer.alfred.utils.PinConverter;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -27,7 +26,6 @@ import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
-import com.twilio.sdk.TwilioRestException;
 
 /**
  * Raspberry Pi Doorbell Plugin with Webcam option
@@ -266,16 +264,12 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
           // send texts
           if (DEPLOYED)
           {
-            Server.INSTANCE.sendTextAlert("Visitor Detected", outputfile.getAbsolutePath());
+            // TODO send alert
           }
         }
         catch (IOException e)
         {
           LOG.error("Trouble saving image", e);
-        }
-        catch (TwilioRestException e)
-        {
-          LOG.error("Error sending text message", e);
         }
 
       }
