@@ -24,7 +24,8 @@ public class SapsTest
     for(String email : emails) {
       LOG.debug("Email: {}", email);
     }
+    int doorbellReset = Config.INSTANCE.getDoorbellReset();
     LOG.debug("Doorbell Reset: {}", Config.INSTANCE.getDoorbellReset());
-    assertEquals("Numbers should be equal", 120, Config.INSTANCE.getDoorbellReset());
+    assertEquals("Numbers should be equal", doorbellReset, Config.INSTANCE.getDoorbellReset());
   }
 }
