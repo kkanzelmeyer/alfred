@@ -17,6 +17,7 @@ public class App
 
   public static void main(String[] args)
   {
+    Server.INSTANCE.printGreeting();
     try
     {
       String date = String.valueOf(System.currentTimeMillis());
@@ -24,7 +25,7 @@ public class App
       email.setDate(date);
       email.setImagePath("/home/kevin/Alfred/img/visitor1458397515036.jpg");
       email.setSubject("Visitor at the Front Door");
-      Server.sendEmail(email);
+      Server.INSTANCE.sendEmail(email);
     }
     catch (Exception e)
     {

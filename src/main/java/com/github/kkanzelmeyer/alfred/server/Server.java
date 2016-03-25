@@ -63,10 +63,10 @@ public enum Server
    * @param email
    *          A reference to a valid email object
    */
-  public static void sendEmail(Email email)
+  public boolean sendEmail(Email email)
   {
     ArrayList<String> emailClients = Config.INSTANCE.getEmails();
-    
+
     if (emailClients.size() > 0)
     {
 
@@ -85,17 +85,23 @@ public enum Server
       String clients = StringUtils.implode(emailClients, ",");
       try
       {
-        LOG.debug("Email on thread {}", Thread.currentThread().getId());
-        Message message = new MimeMessage(session);
-        message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(clients));
-        message.setSubject(email.getSubject());
+        if (Config.INSTANCE.getEnvironment().equals("production"))
+        {
+          LOG.debug("Email on thread {}", Thread.currentThread().getId());
+          Message message = new MimeMessage(session);
+          message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(clients));
+          message.setSubject(email.getSubject());
 
-        // add email content to message
-        message.setContent(email.getContent());
+          // add email content to message
+          message.setContent(email.getContent());
 
-        // send email
-        Transport.send(message);
+          // send email
+          Transport.send(message);
+        } else {
+          LOG.debug("Warning: In development environment an email is not actually sent");
+        }
         LOG.info("Email sent to {}", clients);
+        return true;
       }
       catch (MessagingException e)
       {
@@ -103,16 +109,17 @@ public enum Server
         throw new RuntimeException(e);
       }
     }
+    return false;
   }
 
   /**
    * Simple method to print a greeting at the startup of the server
    */
-  public static void printGreeting()
+  public void printGreeting()
   {
-    LOG.info( "\n-----------------------------------------------------------" + 
-              "\n             Alfred Home Server"
-            + "\n-----------------------------------------------------------" + "\n");
+    LOG.info("\n-----------------------------------------------------------" +
+        "\n             Alfred Home Server"
+        + "\n-----------------------------------------------------------" + "\n");
     LOG.info("Starting Alfred Server");
   }
 }
