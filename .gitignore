@@ -3,4 +3,6 @@ target/
 .project
 .settings/
 .DS_Store
-src/main/resources/production/*
+logback.xml
+logback.production.xml
+/dist/
