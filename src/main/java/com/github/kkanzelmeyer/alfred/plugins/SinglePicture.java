@@ -6,10 +6,10 @@ import java.awt.image.RenderedImage;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
 
-public class WebCameraThread implements Runnable
+public class SinglePicture implements Runnable
 {
 
-  private RenderedImage image;
+  private RenderedImage  image;
   private WebCamCallback _handler;
 
   public RenderedImage getImage()
@@ -17,7 +17,7 @@ public class WebCameraThread implements Runnable
     return image;
   }
 
-  public WebCameraThread(WebCamCallback handler)
+  public SinglePicture(WebCamCallback handler)
   {
     _handler = handler;
     Webcam.setDriver(new V4l4jDriver()); // this is important
@@ -40,14 +40,17 @@ public class WebCameraThread implements Runnable
    */
   public void takePicture()
   {
-    // Custom resolution
-    Dimension[] myResolution = new Dimension[]
-    { new Dimension(640, 360), new Dimension(1280, 720) };
     // TODO make webcam device a SAP
     Webcam webcam = Webcam.getDefault();
+    webcam.open();
+    // Custom resolution
+    Dimension[] myResolution = new Dimension[]
+    { 
+        new Dimension(640, 360), 
+        new Dimension(1280, 720) 
+    };
     webcam.setCustomViewSizes(myResolution);
     webcam.setViewSize(myResolution[0]);
-    webcam.open();
     image = webcam.getImage();
     webcam.close();
   }

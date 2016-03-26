@@ -18,6 +18,8 @@ import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceHandler;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceManager;
 import com.github.kkanzelmeyer.alfred.datamodel.enums.State;
 import com.github.kkanzelmeyer.alfred.server.Config;
+import com.github.kkanzelmeyer.alfred.server.Server;
+import com.github.kkanzelmeyer.alfred.server.VisitorEmail;
 import com.github.kkanzelmeyer.alfred.utils.PinConverter;
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -160,15 +162,7 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
 
     private DoorbellResetTask resetTask = null;
 
-    public void onAddDevice(StateDevice device)
-    {
-      // filter message based on this plugin's device id
-      if (device.getId().equals(myDeviceId))
-      {
-        LOG.trace("Device added");
-        LOG.trace(device.toString());
-      }
-    }
+    public void onAddDevice(StateDevice device) {}
 
     /**
      * This method starts a thread to capture an image with the webcam. It also
@@ -188,7 +182,7 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
         if (device.getState() == State.ACTIVE)
         {
 
-          WebCameraThread webCamThread = new WebCameraThread(new TakePictureCallback());
+          SinglePicture webCamThread = new SinglePicture(new TakePictureCallback());
           new Thread(webCamThread).start();
 
           // start a reset timer
@@ -239,7 +233,6 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
      */
     private class TakePictureCallback implements WebCamCallback
     {
-
       /**
        * This method adds the image to the message that was started in the
        * parent class onDeviceUpdate method. After the message is built it is
@@ -264,7 +257,11 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
           // send texts
           if (DEPLOYED)
           {
-            // TODO send alert
+            VisitorEmail email = new VisitorEmail();
+            email.setDate(date);
+            email.setImagePath(outputfile.getAbsolutePath());
+            email.setSubject("Visitor at the Front Door");
+            Server.INSTANCE.sendEmail(email);
           }
         }
         catch (IOException e)
@@ -273,6 +270,9 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
         }
 
       }
+
+      @Override
+      public void onComplete() {}
     }
 
     /**
