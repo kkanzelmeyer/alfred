@@ -25,8 +25,8 @@ public enum Config
   private String mEnvironment = null;
   // timeout (seconds) before resetting the doorbell to INACTIVE
   private int mDoorbellReset = 5;
-  // number of additional pictures to take after sending the first
-  private int mExtraPictures = 1;
+  // time between motion detect
+  private int mMotionInterval = 1000;
   // Email saps
   private String auth = null;
   private String ttls = null;
@@ -74,9 +74,9 @@ public enum Config
       username = (String) mail.get("username");
       token = (String) mail.get("token");
       
-      val = (Long) json.get("extraPictures");
-      mExtraPictures = val.intValue();
-      LOG.debug("Extra Pictures : {}", mExtraPictures);
+      val = (Long) json.get("motionInterval");
+      mMotionInterval = val.intValue();
+      LOG.debug("Motion Interval : {}", mMotionInterval);
       
       LOG.debug("Finshed with json saps");
 
@@ -146,9 +146,9 @@ public enum Config
     return token;
   }
   
-  public int getExtraPictures() 
+  public int getMotionInterval() 
   {
-    return mExtraPictures;
+    return mMotionInterval;
   }
 
 }

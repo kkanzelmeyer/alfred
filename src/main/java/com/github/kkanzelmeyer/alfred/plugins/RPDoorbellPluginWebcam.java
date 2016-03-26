@@ -53,7 +53,7 @@ import com.pi4j.io.gpio.event.GpioPinListenerDigital;
  * @author kevin
  *
  */
-public class RPDoorbellPluginWebcam implements DevicePlugin
+public class RPDoorbellPluginWebcam extends DevicePlugin
 {
 
   private int                  pin;
@@ -67,19 +67,9 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
 
   public RPDoorbellPluginWebcam(int pin, StateDevice device)
   {
+    super(device);
     this.pin = pin;
     this.myDeviceId = device.getId();
-  }
-
-  /**
-   * @param pin
-   * @param deviceId
-   * @deprecated
-   */
-  public RPDoorbellPluginWebcam(int pin, String deviceId)
-  {
-    this.pin = pin;
-    this.myDeviceId = deviceId;
   }
 
   /**
@@ -268,9 +258,9 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
           Server.INSTANCE.sendEmail(email);
             
           // take more pictures
-          if(Config.INSTANCE.getExtraPictures() > 0) {
+          if(Config.INSTANCE.getMotionInterval() > 0) {
             LOG.debug("Taking additional pictures");
-            new Thread(new MultiPicture(Config.INSTANCE.getExtraPictures(), new WebCamCallback()
+            new Thread(new MultiPicture(Config.INSTANCE.getMotionInterval(), new WebCamCallback()
             {
               @Override
               public void onComplete()
@@ -297,38 +287,6 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
       @Override
       public void onComplete() {}
     }
-
-    /**
-     * Class to reset the doorbell state to inactive. This timer task is
-     * scheduled by the parent class
-     * 
-     * @author Kevin Kanzelmeyer
-     *
-     */
-//    private class DoorbellResetTask extends TimerTask
-//    {
-//
-//      private StateDevice mDevice = null;
-//
-//      /**
-//       * @param device
-//       *          The device to reset to INACTIVE
-//       */
-//      public DoorbellResetTask(StateDevice device)
-//      {
-//        mDevice = device;
-//      }
-//
-//      /**
-//       * Task to be executed when the timer scheduler calls it
-//       */
-//      @Override
-//      public void run()
-//      {
-//        LOG.info("Resetting {}", mDevice.getName());
-//        StateDeviceManager.INSTANCE.updateStateDevice(mDevice.getId(), State.INACTIVE);
-//      }
-//    }
   }
 
 }

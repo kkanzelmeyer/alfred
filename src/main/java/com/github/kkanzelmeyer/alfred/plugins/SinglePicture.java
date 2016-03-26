@@ -50,24 +50,13 @@ public class SinglePicture implements Runnable
     };
     webcam.setCustomViewSizes(myResolution);
     webcam.setViewSize(myResolution[0]);
+    // take a dummy picture and discard
     webcam.open();
-//    sleep(700);
+    webcam.getImage();
     webcam.close();
+    
     webcam.open();
     image = webcam.getImage();
     webcam.close();
-  }
-
-  private void sleep(int millis)
-  {
-    try
-    {
-      Thread.sleep(millis);
-    }
-    catch (InterruptedException e)
-    {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
   }
 }
