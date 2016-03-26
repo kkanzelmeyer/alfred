@@ -23,7 +23,10 @@ public enum Config
   private String mImageDir = null;
   private ArrayList<String> mEmails = null;
   private String mEnvironment = null;
+  // timeout (seconds) before resetting the doorbell to INACTIVE
   private int mDoorbellReset = 5;
+  // number of additional pictures to take after sending the first
+  private int mExtraPictures = 1;
   // Email saps
   private String auth = null;
   private String ttls = null;
@@ -70,6 +73,10 @@ public enum Config
       port = (String) smtp.get("port");
       username = (String) mail.get("username");
       token = (String) mail.get("token");
+      
+      val = (Long) json.get("extraPictures");
+      mExtraPictures = val.intValue();
+      LOG.debug("Extra Pictures : {}", mExtraPictures);
       
       LOG.debug("Finshed with json saps");
 
@@ -134,10 +141,14 @@ public enum Config
     return username;
   }
 
-
   public String getToken()
   {
     return token;
+  }
+  
+  public int getExtraPictures() 
+  {
+    return mExtraPictures;
   }
 
 }

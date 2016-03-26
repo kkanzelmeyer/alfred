@@ -46,7 +46,6 @@ public class MultiPicture implements Runnable
   {
     // TODO make webcam device a SAP
     Webcam webcam = Webcam.getDefault();
-    webcam.open();
     // Custom resolution
     Dimension[] myResolution = new Dimension[]
     {
@@ -57,15 +56,15 @@ public class MultiPicture implements Runnable
     webcam.setViewSize(myResolution[0]);
     for (int i = 0; i < mImages; i++)
     {
+      webcam.open();
       saveImage(webcam.getImage());
+      sleep(1000);
+      webcam.close();
     }
-    webcam.close();
   }
 
   private boolean saveImage(RenderedImage img)
   {
-    LOG.debug("Finished taking picture. Adding to message");
-
     // Save the image to a file
     LOG.debug("Saving image file on server");
     String date = String.valueOf(System.currentTimeMillis());
@@ -83,5 +82,18 @@ public class MultiPicture implements Runnable
       LOG.error("Trouble saving image", e);
     }
     return false;
+  }
+
+  private void sleep(int millis)
+  {
+    try
+    {
+      Thread.sleep(millis);
+    }
+    catch (InterruptedException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 }

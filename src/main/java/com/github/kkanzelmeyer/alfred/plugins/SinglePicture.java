@@ -42,16 +42,32 @@ public class SinglePicture implements Runnable
   {
     // TODO make webcam device a SAP
     Webcam webcam = Webcam.getDefault();
-    webcam.open();
     // Custom resolution
     Dimension[] myResolution = new Dimension[]
-    { 
-        new Dimension(640, 360), 
-        new Dimension(1280, 720) 
+    {
+        new Dimension(640, 360),
+        new Dimension(1280, 720)
     };
     webcam.setCustomViewSizes(myResolution);
     webcam.setViewSize(myResolution[0]);
+    webcam.open();
+//    sleep(700);
+    webcam.close();
+    webcam.open();
     image = webcam.getImage();
     webcam.close();
+  }
+
+  private void sleep(int millis)
+  {
+    try
+    {
+      Thread.sleep(millis);
+    }
+    catch (InterruptedException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 }

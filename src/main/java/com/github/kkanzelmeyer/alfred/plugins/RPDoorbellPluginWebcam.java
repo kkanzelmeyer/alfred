@@ -63,7 +63,6 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
   private final String         CLASSNAME    = this.getClass().getSimpleName();
   private Timer                timer        = null;
 
-  private static final boolean DEPLOYED = Config.INSTANCE.getEnvironment().equals("production");
   final private static Logger  LOG      = LoggerFactory.getLogger(RPDoorbellPluginWebcam.class);
 
   public RPDoorbellPluginWebcam(int pin, StateDevice device)
@@ -160,8 +159,6 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
   public class DoorbellStateHandler implements StateDeviceHandler
   {
 
-    private DoorbellResetTask resetTask = null;
-
     public void onAddDevice(StateDevice device) {}
 
     /**
@@ -216,12 +213,21 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
      */
     public void startResetTimer(StateDevice device)
     {
-      resetTask = new DoorbellResetTask(device);
       Calendar calendar = Calendar.getInstance();
       calendar.add(Calendar.SECOND, Config.INSTANCE.getDoorbellReset());
       Date endTime = calendar.getTime();
       LOG.info("Scheduling reset timer");
-      timer.schedule(resetTask, endTime);
+//      timer.schedule(new DoorbellResetTask(device), endTime);
+      timer.schedule(new TimerTask() 
+      {
+        @Override
+        public void run()
+        {
+          LOG.info("Resetting {}", device.getName());
+          StateDeviceManager.INSTANCE.updateStateDevice(device.getId(), State.INACTIVE);
+        }
+        
+      }, endTime);
     }
 
     /**
@@ -254,15 +260,32 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
           ImageIO.write(image, "jpg", outputfile);
           LOG.debug("Image saved: {}", outputfile.getAbsolutePath());
           
-          // send texts
-          if (DEPLOYED)
-          {
-            VisitorEmail email = new VisitorEmail();
-            email.setDate(date);
-            email.setImagePath(outputfile.getAbsolutePath());
-            email.setSubject("Visitor at the Front Door");
-            Server.INSTANCE.sendEmail(email);
+          // send alerts
+          VisitorEmail email = new VisitorEmail();
+          email.setDate(date);
+          email.setImagePath(outputfile.getAbsolutePath());
+          email.setSubject("Visitor at the Front Door");
+          Server.INSTANCE.sendEmail(email);
+            
+          // take more pictures
+          if(Config.INSTANCE.getExtraPictures() > 0) {
+            LOG.debug("Taking additional pictures");
+            new Thread(new MultiPicture(Config.INSTANCE.getExtraPictures(), new WebCamCallback()
+            {
+              @Override
+              public void onComplete()
+              {
+                LOG.info("Finished taking more pictures");
+              }
+
+              @Override
+              public void onComplete(RenderedImage image)
+              {
+              }
+            })).start();;
           }
+          
+
         }
         catch (IOException e)
         {
@@ -282,30 +305,30 @@ public class RPDoorbellPluginWebcam implements DevicePlugin
      * @author Kevin Kanzelmeyer
      *
      */
-    private class DoorbellResetTask extends TimerTask
-    {
-
-      private StateDevice mDevice = null;
-
-      /**
-       * @param device
-       *          The device to reset to INACTIVE
-       */
-      public DoorbellResetTask(StateDevice device)
-      {
-        mDevice = device;
-      }
-
-      /**
-       * Task to be executed when the timer scheduler calls it
-       */
-      @Override
-      public void run()
-      {
-        LOG.info("Resetting {}", mDevice.getName());
-        StateDeviceManager.INSTANCE.updateStateDevice(mDevice.getId(), State.INACTIVE);
-      }
-    }
+//    private class DoorbellResetTask extends TimerTask
+//    {
+//
+//      private StateDevice mDevice = null;
+//
+//      /**
+//       * @param device
+//       *          The device to reset to INACTIVE
+//       */
+//      public DoorbellResetTask(StateDevice device)
+//      {
+//        mDevice = device;
+//      }
+//
+//      /**
+//       * Task to be executed when the timer scheduler calls it
+//       */
+//      @Override
+//      public void run()
+//      {
+//        LOG.info("Resetting {}", mDevice.getName());
+//        StateDeviceManager.INSTANCE.updateStateDevice(mDevice.getId(), State.INACTIVE);
+//      }
+//    }
   }
 
 }

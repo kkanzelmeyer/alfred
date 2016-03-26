@@ -65,27 +65,26 @@ public enum Server
    */
   public boolean sendEmail(Email email)
   {
-    ArrayList<String> emailClients = Config.INSTANCE.getEmails();
-
-    if (emailClients.size() > 0)
+    // only send if the environment is production
+    if (Config.INSTANCE.getEnvironment().equals("production"))
     {
-
-      final String username = Config.INSTANCE.getUsername();
-      final String password = Config.INSTANCE.getToken();
-
-      Session session = Session.getInstance(Config.INSTANCE.getEmailProperties(), new javax.mail.Authenticator()
+      ArrayList<String> emailClients = Config.INSTANCE.getEmails();
+      if (emailClients.size() > 0)
       {
-        protected PasswordAuthentication getPasswordAuthentication()
+        final String username = Config.INSTANCE.getUsername();
+        final String password = Config.INSTANCE.getToken();
+
+        Session session = Session.getInstance(Config.INSTANCE.getEmailProperties(), new javax.mail.Authenticator()
         {
-          return new PasswordAuthentication(username, password);
-        }
-      });
+          protected PasswordAuthentication getPasswordAuthentication()
+          {
+            return new PasswordAuthentication(username, password);
+          }
+        });
 
-      // convert clients list into a comma separated string
-      String clients = StringUtils.implode(emailClients, ",");
-      try
-      {
-        if (Config.INSTANCE.getEnvironment().equals("production"))
+        // convert clients list into a comma separated string
+        String clients = StringUtils.implode(emailClients, ",");
+        try
         {
           LOG.debug("Email on thread {}", Thread.currentThread().getId());
           Message message = new MimeMessage(session);
@@ -97,17 +96,19 @@ public enum Server
 
           // send email
           Transport.send(message);
-        } else {
-          LOG.debug("Warning: In development environment an email is not actually sent");
+          LOG.info("Email sent to {}", clients);
+          return true;
         }
-        LOG.info("Email sent to {}", clients);
-        return true;
+        catch (MessagingException e)
+        {
+          LOG.error("Email error", e);
+          throw new RuntimeException(e);
+        }
       }
-      catch (MessagingException e)
-      {
-        LOG.error("Email error", e);
-        throw new RuntimeException(e);
-      }
+    }
+    else
+    {
+      LOG.debug("Warning: In development environment an email is not actually sent");
     }
     return false;
   }
