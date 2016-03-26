@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.kkanzelmeyer.alfred.utils.ParseJsonFile;
-import com.twilio.sdk.TwilioRestClient;
 
 /**
  * @author kevin
@@ -22,12 +21,9 @@ public enum Config
   INSTANCE;
 
   private String mImageDir = null;
-  private String twilioSid = null;
-  private String twilioToken = null;
   private ArrayList<String> mEmails = null;
   private String mEnvironment = null;
   private int mDoorbellReset = 5;
-  private TwilioRestClient mClient = null;
   // Email saps
   private String auth = null;
   private String ttls = null;
@@ -47,12 +43,6 @@ public enum Config
       JSONObject json = ParseJsonFile.toObject("config.json");
 
       LOG.debug("Saving SAPS");
-      JSONObject twilio = (JSONObject) json.get("twilio");
-      twilioSid = (String) twilio.get("sid");
-      LOG.debug("Twilio SID: {}", twilioSid);
-
-      twilioToken = (String) twilio.get("token");
-      LOG.debug("Twilio Token: {}", twilioToken);
 
       mImageDir = (String) json.get("imageDir");
       LOG.debug("Image Directory: {}", mImageDir);
@@ -118,17 +108,6 @@ public enum Config
   public void setDoorbellReset(int val)
   {
     mDoorbellReset = val;
-  }
-
-  public TwilioRestClient getTwilioClient()
-  {
-    // Create twilio obj
-    if (mClient == null)
-    {
-      LOG.debug("Creating twilio client");
-      mClient = new TwilioRestClient(twilioSid, twilioToken);
-    }
-    return mClient;
   }
 
   public Properties getEmailProperties()

@@ -85,10 +85,16 @@
       <version>1.4.7</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.logback-extensions</groupId>
+      <artifactId>logback-ext-loggly</artifactId>
+      <version>0.1.2</version>
+    </dependency>
+
   </dependencies>
 
   <profiles>
-    <profile>
+    <!-- <profile>
       <id>development</id>
       <activation>
         <activeByDefault>true</activeByDefault>
@@ -96,18 +102,24 @@
       <properties>
         <envName>development</envName>
       </properties>
-    </profile>
+    </profile> -->
     <profile>
-      <id>deploy</id>
+      <id>production</id>
       <properties>
-        <envName>deploy</envName>
+        <envName>production</envName>
       </properties>
     </profile>
   </profiles>
 
   <build>
-    <plugins>
 
+    <resources>
+      <resource>
+        <directory>src/main/resources/${envName}/*</directory>
+      </resource>
+    </resources>
+
+    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
