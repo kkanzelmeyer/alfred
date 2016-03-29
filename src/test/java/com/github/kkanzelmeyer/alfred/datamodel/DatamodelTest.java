@@ -1,6 +1,6 @@
 package com.github.kkanzelmeyer.alfred.datamodel;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDevice.Builder;
 import com.github.kkanzelmeyer.alfred.datamodel.enums.State;
 import com.github.kkanzelmeyer.alfred.datamodel.enums.Type;
-import com.github.kkanzelmeyer.alfred.plugins.RPDoorbellPluginWebcam;
+import com.github.kkanzelmeyer.alfred.plugins.WebcamMotionPlugin;
 
 public class DatamodelTest
 {
@@ -57,7 +57,7 @@ public class DatamodelTest
     StateDeviceManager.INSTANCE.addStateDevice(doorbell);
 
     LOG.debug("Activating new plugin");
-    RPDoorbellPluginWebcam plugin = new RPDoorbellPluginWebcam(12, doorbell);
+    WebcamMotionPlugin plugin = new WebcamMotionPlugin(doorbell);
     plugin.activate();
 
     // set a new state

@@ -3,11 +3,18 @@ package com.github.kkanzelmeyer.alfred;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.kkanzelmeyer.alfred.datamodel.StateDevice;
+import com.github.kkanzelmeyer.alfred.datamodel.StateDevice.Builder;
+import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceManager;
+import com.github.kkanzelmeyer.alfred.datamodel.enums.State;
+import com.github.kkanzelmeyer.alfred.datamodel.enums.Type;
+import com.github.kkanzelmeyer.alfred.plugins.WebcamMotionPlugin;
 import com.github.kkanzelmeyer.alfred.server.Server;
-import com.github.kkanzelmeyer.alfred.server.VisitorEmail;
+
 
 /**
- * Hello world!
+ * Alfred App
+ * @author kevin
  *
  */
 public class App
@@ -18,18 +25,26 @@ public class App
   public static void main(String[] args)
   {
     Server.INSTANCE.printGreeting();
-    try
-    {
-      String date = String.valueOf(System.currentTimeMillis());
-      VisitorEmail email = new VisitorEmail();
-      email.setDate(date);
-      email.setImagePath("/home/kevin/Alfred/img/visitor1458397515036.jpg");
-      email.setSubject("Visitor at the Front Door");
-      Server.INSTANCE.sendEmail(email);
-    }
-    catch (Exception e)
-    {
-      LOG.error("Exception thrown", e);
+    
+    // create new device and add it to the data model
+    LOG.info("Starting Alfred");
+    LOG.trace("Creating state device");
+    StateDevice doorbell = new StateDevice(new Builder()
+        .setId("front-door")
+        .setName("Front Door")
+        .setState(State.INACTIVE)
+        .setType(Type.MOTION_WEBCAM)
+        .build());
+
+    LOG.trace("Adding device to device manager");
+    StateDeviceManager.INSTANCE.addStateDevice(doorbell);
+
+    LOG.trace("Activating new plugin");
+    WebcamMotionPlugin plugin = new WebcamMotionPlugin(doorbell);
+    plugin.activate();
+
+    while(true) {
+      
     }
   }
 }
