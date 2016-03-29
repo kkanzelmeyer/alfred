@@ -5,3 +5,4 @@ target/
 .DS_Store
 src/main/resources/production/*
 log/
+logback.xml

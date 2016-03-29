@@ -51,7 +51,6 @@
       <version>0.3.11</version>
     </dependency>
 
-
     <dependency>
       <groupId>com.github.sarxos</groupId>
       <artifactId>webcam-capture-driver-fswebcam</artifactId>
@@ -97,7 +96,6 @@
   </dependencies>
 
   <build>
-
 
     <plugins>
       <plugin>

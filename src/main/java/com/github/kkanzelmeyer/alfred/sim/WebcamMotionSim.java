@@ -39,18 +39,12 @@ public class WebcamMotionSim
     WebcamMotionPlugin plugin = new WebcamMotionPlugin(doorbell);
     plugin.activate();
 
-    try
-    {
-      Thread.sleep(30000);
+    while(true) {
+      
     }
-    catch (InterruptedException e)
-    {
-      LOG.error("Problem sleeping", e);
-    }
-
     // deactivate the plugin to cancel the timing thread
-    LOG.debug("Deactivating plugin " + plugin.getClass().getSimpleName());
-    plugin.deactivate();
+//    LOG.debug("Deactivating plugin " + plugin.getClass().getSimpleName());
+//    plugin.deactivate();
     
   }
 

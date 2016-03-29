@@ -3,7 +3,8 @@ package com.github.kkanzelmeyer.alfred.plugins;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Timer;
@@ -54,6 +55,10 @@ public class WebcamMotionPlugin extends DevicePlugin
     };
     webcam.setCustomViewSizes(myResolution);
     webcam.setViewSize(myResolution[0]);
+    // take a throwaway picture to allow the camera to adjust itself
+    webcam.open();
+    webcam.getImage();
+    webcam.close();
   }
   
   @Override
@@ -65,8 +70,10 @@ public class WebcamMotionPlugin extends DevicePlugin
     if(detector == null)
     {
       detector = new WebcamMotionDetector(webcam);
-      // TODO make interval a SAP
+      detector.setAreaThreshold(Config.INSTANCE.getAreaThreshold());
+      detector.setInertia(Config.INSTANCE.getInertia());
       detector.setInterval(Config.INSTANCE.getMotionInterval());
+      detector.setPixelThreshold(Config.INSTANCE.getPixelThreshold());
       detector.addMotionListener(new MotionListener());
       detector.start();
     }
@@ -114,18 +121,29 @@ public class WebcamMotionPlugin extends DevicePlugin
     public String saveImage(BufferedImage image)
     {
       // Save the image to a file
-      LOG.debug("Saving image file on server");
-      String date = String.valueOf(System.currentTimeMillis());
-      String filename = "visitor" + date + ".jpg";
       try
       {
-        File directory = new File(Config.INSTANCE.getImageDir());
+        // Create directory
+        Calendar today = Calendar.getInstance();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String dayFormat = df.format(today.getTime());
+        File directory = new File(Config.INSTANCE.getImageDir()+ "/" + dayFormat);
+        if(!directory.exists())
+        {
+          directory.mkdirs();
+        }
+        
+        // Create file
+        df = new SimpleDateFormat("yyyyMMdd-kkmmss");
+        String date = df.format(today.getTime());
+        String filename = "visitor" + date + ".jpg";
         File outputfile = new File(directory, filename);
+        LOG.debug("Saving image: {}", outputfile.getAbsolutePath());
         ImageIO.write(image, "jpg", outputfile);
         LOG.debug("Image saved: {}", outputfile.getAbsolutePath());
         return outputfile.getAbsolutePath();
       }
-      catch (IOException e)
+      catch (Exception e)
       {
         LOG.error("Trouble saving image", e);
       }
@@ -182,7 +200,7 @@ public class WebcamMotionPlugin extends DevicePlugin
     public void startResetTimer(StateDevice device)
     {
       Calendar calendar = Calendar.getInstance();
-      calendar.add(Calendar.MILLISECOND, Config.INSTANCE.getDoorbellReset());
+      calendar.add(Calendar.SECOND, Config.INSTANCE.getDoorbellReset());
       Date endTime = calendar.getTime();
       LOG.info("Scheduling reset timer");
       // timer.schedule(new DoorbellResetTask(device), endTime);

@@ -25,8 +25,11 @@ public enum Config
   private String mEnvironment = null;
   // timeout (seconds) before resetting the doorbell to INACTIVE
   private int mDoorbellReset = 5;
-  // time between motion detect
+  // motion detection algorithm settings
   private int mMotionInterval = 1000;
+  private double mAreaThreshold = 10;
+  private int mPixelThreshold = 40;
+  private int mInertia = 1000;
   // Email saps
   private String auth = null;
   private String ttls = null;
@@ -35,7 +38,7 @@ public enum Config
   private String username = null;
   private String token = null;
   private Properties mProperties = null;
-  
+
   private final Logger LOG = LoggerFactory.getLogger(Config.class);
 
   private Config()
@@ -73,16 +76,29 @@ public enum Config
       port = (String) smtp.get("port");
       username = (String) mail.get("username");
       token = (String) mail.get("token");
-      
+
+      // webcam algorithm settings
       val = (Long) json.get("motionInterval");
       mMotionInterval = val.intValue();
       LOG.debug("Motion Interval : {}", mMotionInterval);
-      
+
+      val = (Long) json.get("areaThreshold");
+      mAreaThreshold = val.doubleValue();
+      LOG.debug("Area Threshold : {}", mAreaThreshold);
+
+      val = (Long) json.get("pixelThreshold");
+      mPixelThreshold = val.intValue();
+      LOG.debug("Pixel Threshold : {}", mPixelThreshold);
+
+      val = (Long) json.get("inertia");
+      mInertia = val.intValue();
+      LOG.debug("Motion Inertia : {}", mInertia);
+
       LOG.debug("Finshed with json saps");
 
       // TODO set to environmental variable for deployment
       // mEnvironment = System.getenv("JAVA_ENV");
-      mEnvironment = "development";
+      mEnvironment = "production";
 
     }
     catch (Exception e)
@@ -145,10 +161,25 @@ public enum Config
   {
     return token;
   }
-  
-  public int getMotionInterval() 
+
+  public int getMotionInterval()
   {
     return mMotionInterval;
+  }
+
+  public double getAreaThreshold()
+  {
+    return mAreaThreshold;
+  }
+
+  public int getInertia()
+  {
+    return mInertia;
+  }
+
+  public int getPixelThreshold()
+  {
+    return mPixelThreshold;
   }
 
 }
