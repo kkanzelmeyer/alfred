@@ -2,3 +2,7 @@ config.json
 target/
 .project
 .settings/
+.DS_Store
+log/
+logback.xml
+

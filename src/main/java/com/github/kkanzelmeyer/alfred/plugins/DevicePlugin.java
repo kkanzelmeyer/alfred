@@ -1,10 +1,21 @@
 package com.github.kkanzelmeyer.alfred.plugins;
 
-public interface DevicePlugin
+import com.github.kkanzelmeyer.alfred.datamodel.StateDevice;
+
+public abstract class DevicePlugin
 {
+  String myDeviceId = null;
+  
+  DevicePlugin(StateDevice device)
+  {
+    if(myDeviceId == null)
+    {
+      myDeviceId = device.getId();
+    }
+  }
 
-  public void activate();
+  public abstract void activate();
 
-  public void deactivate();
+  public abstract void deactivate();
 
 }

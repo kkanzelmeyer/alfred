@@ -48,7 +48,7 @@
     <dependency>
       <groupId>com.github.sarxos</groupId>
       <artifactId>webcam-capture</artifactId>
-      <version>0.3.10</version>
+      <version>0.3.11</version>
     </dependency>
 
     <dependency>
@@ -60,7 +60,7 @@
     <dependency>
       <groupId>com.github.sarxos</groupId>
       <artifactId>webcam-capture-driver-v4l4j</artifactId>
-      <version>0.3.11-SNAPSHOT</version>
+      <version>0.3.11</version>
     </dependency>
 
     <dependency>
@@ -81,11 +81,23 @@
       <version>3.4.5</version>
     </dependency>
 
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4.7</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.logback-extensions</groupId>
+      <artifactId>logback-ext-loggly</artifactId>
+      <version>0.1.2</version>
+    </dependency>
+
   </dependencies>
 
   <build>
-    <plugins>
 
+    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
