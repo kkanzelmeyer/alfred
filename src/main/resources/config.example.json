@@ -1,9 +1,22 @@
 {
-  "twilio": "twilioId",
-  "numbers": [
-		"777-777-7777",
-		"555-555-5555"
-	],
-  "imageDir": "/some/path/on/your/machine",
-  "doorbellReset": 120
+    "emails" : [
+         "you@youremail.org",
+         "youcanuse@smsemails.too"
+    ],
+    "imageDir" : "/path/to/save/images/Alfred/img",
+    "motionInterval" : 500,
+    "areaThreshold" : 15,
+    "pixelThreshold" : 38,
+    "inertia" : 500,
+    "doorbellReset" : 300,
+    "mail" : {
+        "smtp" : {
+            "auth" : "true",
+            "ttls" : "true",
+            "host" : "smtp.gmail.com",
+            "port" : "587"
+        },
+        "username" : "yourgmailaddress@tosendfrom.com",
+        "token" : "yoursecrettoken"
+    }
 }
