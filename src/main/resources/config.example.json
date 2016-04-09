@@ -1,9 +1,9 @@
 {
-    'twilio' : 'twilioId',
-    'numbers' : [
-         'phone' : '777-777-7777',
-         'phone' : '555-555-5555'
-     ],
-     'imageDir' : '/some/path/on/your/machine',
-     'doorbellReset' : 120
+  "twilio": "twilioId",
+  "numbers": [
+		"777-777-7777",
+		"555-555-5555"
+	],
+  "imageDir": "/some/path/on/your/machine",
+  "doorbellReset": 120
 }
