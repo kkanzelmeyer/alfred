@@ -3,6 +3,12 @@ target/
 .project
 .settings/
 .DS_Store
+<<<<<<< HEAD
 logback.xml
 logback.production.xml
 /dist/
+=======
+log/
+logback.xml
+
+>>>>>>> f4ae0eda6a11079fa2edcf3c17bebb767a806337

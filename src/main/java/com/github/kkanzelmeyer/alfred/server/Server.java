@@ -14,48 +14,11 @@ import org.bridj.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.kkanzelmeyer.alfred.datamodel.StateDevice;
-import com.github.kkanzelmeyer.alfred.datamodel.StateDevice.Builder;
-import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceManager;
-import com.github.kkanzelmeyer.alfred.datamodel.enums.State;
-import com.github.kkanzelmeyer.alfred.datamodel.enums.Type;
-import com.github.kkanzelmeyer.alfred.plugins.RPDoorbellPluginWebcam;
-
 public enum Server
 {
   INSTANCE;
 
   private static final Logger LOG = LoggerFactory.getLogger(Server.class);
-
-  /**
-   * initialize the state devices and plugins
-   */
-  public void init()
-  {
-    LOG.trace("Initializing server");
-
-    // create device and add it to the manager
-    LOG.trace("Creating state device");
-    StateDevice doorbell = new StateDevice(new Builder()
-        .setId("front-door")
-        .setName("Front Door")
-        .setState(State.INACTIVE)
-        .setType(Type.DOORBELL_WEBCAM)
-        .build());
-
-    LOG.trace("Adding device to device manager");
-    StateDeviceManager.INSTANCE.addStateDevice(doorbell);
-
-    // initialize device plugin
-    new RPDoorbellPluginWebcam(12, doorbell).activate();
-
-  }
-
-  public void run()
-  {
-    LOG.trace("Running server");
-
-  }
 
   /**
    * Method to send an email message to all email clients
@@ -65,27 +28,26 @@ public enum Server
    */
   public boolean sendEmail(Email email)
   {
-    ArrayList<String> emailClients = Config.INSTANCE.getEmails();
-
-    if (emailClients.size() > 0)
+    // only send if the environment is production
+    if (Config.INSTANCE.getEnvironment().equals("production"))
     {
-
-      final String username = Config.INSTANCE.getUsername();
-      final String password = Config.INSTANCE.getToken();
-
-      Session session = Session.getInstance(Config.INSTANCE.getEmailProperties(), new javax.mail.Authenticator()
+      ArrayList<String> emailClients = Config.INSTANCE.getEmails();
+      if (emailClients.size() > 0)
       {
-        protected PasswordAuthentication getPasswordAuthentication()
+        final String username = Config.INSTANCE.getUsername();
+        final String password = Config.INSTANCE.getToken();
+
+        Session session = Session.getInstance(Config.INSTANCE.getEmailProperties(), new javax.mail.Authenticator()
         {
-          return new PasswordAuthentication(username, password);
-        }
-      });
+          protected PasswordAuthentication getPasswordAuthentication()
+          {
+            return new PasswordAuthentication(username, password);
+          }
+        });
 
-      // convert clients list into a comma separated string
-      String clients = StringUtils.implode(emailClients, ",");
-      try
-      {
-        if (Config.INSTANCE.getEnvironment().equals("production"))
+        // convert clients list into a comma separated string
+        String clients = StringUtils.implode(emailClients, ",");
+        try
         {
           LOG.debug("Email on thread {}", Thread.currentThread().getId());
           Message message = new MimeMessage(session);
@@ -97,17 +59,19 @@ public enum Server
 
           // send email
           Transport.send(message);
-        } else {
-          LOG.debug("Warning: In development environment an email is not actually sent");
+          LOG.info("Email sent to {}", clients);
+          return true;
         }
-        LOG.info("Email sent to {}", clients);
-        return true;
+        catch (MessagingException e)
+        {
+          LOG.error("Email error", e);
+          throw new RuntimeException(e);
+        }
       }
-      catch (MessagingException e)
-      {
-        LOG.error("Email error", e);
-        throw new RuntimeException(e);
-      }
+    }
+    else
+    {
+      LOG.debug("Warning: In development environment an email is not actually sent");
     }
     return false;
   }
