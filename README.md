@@ -1,4 +1,6 @@
-# Alfred
+# Alfred 
+
+![Alfred Logo](https://github.com/kkanzelmeyer/alfred/raw/master/src/main/resources/alfred.png)
 
 ## A Raspberry Pi Motion Sensing Webcam experimental project
 
