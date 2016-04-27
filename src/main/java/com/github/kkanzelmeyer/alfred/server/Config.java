@@ -24,7 +24,7 @@ public enum Config
   private ArrayList<String> mEmails = null;
   private String mEnvironment = null;
   // timeout (seconds) before resetting the doorbell to INACTIVE
-  private int mDoorbellReset = 5;
+  private int mDoorbellReset = 180;
   // motion detection algorithm settings
   private int mMotionInterval = 1000;
   private double mAreaThreshold = 10;
