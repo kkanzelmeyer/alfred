@@ -37,8 +37,9 @@ public class WebcamMotionPlugin extends DevicePlugin
   private Timer                timer        = null;
   private Webcam               webcam       = null;
   private WebcamMotionDetector detector     = null;
-  private BufferedImage        currentImage = null;
-  private String               currentImagePath = null;
+  private BufferedImage        detectionImage = null;
+  private BufferedImage        baselineImage = null;
+  private String               detectionImagePath = null;
   private static final Logger  LOG          = LoggerFactory.getLogger(WebcamMotionPlugin.class);
 
   public WebcamMotionPlugin(StateDevice device)
@@ -108,14 +109,16 @@ public class WebcamMotionPlugin extends DevicePlugin
       LOG.info("Motion detected");
       StateDevice device = StateDeviceManager.INSTANCE.getDevice(myDeviceId);
       State newState;
-      currentImage = wme.getCurrentImage();
-      currentImagePath = saveImage(currentImage);
+      detectionImage = wme.getCurrentImage();
+      detectionImagePath = saveImage(detectionImage);
       if (device.getState() == State.INACTIVE)
       {
-        sendAlert(currentImagePath);
+        sendAlert(detectionImagePath);
         newState = State.ACTIVE;
         StateDeviceManager.INSTANCE.updateStateDevice(myDeviceId, newState);
       }
+      baselineImage = wme.getPreviousImage();
+      saveImage(baselineImage);
     }
 
     public String saveImage(BufferedImage image)
@@ -155,12 +158,16 @@ public class WebcamMotionPlugin extends DevicePlugin
       try
       {
       // send alerts
-      String date = String.valueOf(System.currentTimeMillis());
-      VisitorEmail email = new VisitorEmail();
-      email.setDate(date);
-      email.setImagePath(imagePath);
-      email.setSubject("Visitor at the Front Door");
-      Server.INSTANCE.sendEmail(email);
+        String date = String.valueOf(System.currentTimeMillis());
+        Calendar today = Calendar.getInstance();
+        DateFormat df = new SimpleDateFormat("MMM dd h:mm a");
+        String prettyDate = df.format(today.getTime());
+        VisitorEmail email = new VisitorEmail();
+        email.setDate(date);
+        email.setImagePath(imagePath);
+        email.setSubject("Visitor at the Front Door " + prettyDate);
+        Server.INSTANCE.sendEmail(email);
+        return true;
       }
       catch(Exception e)
       {
