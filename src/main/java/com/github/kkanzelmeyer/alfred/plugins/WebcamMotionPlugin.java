@@ -38,7 +38,7 @@ public class WebcamMotionPlugin extends DevicePlugin
   private Webcam               webcam       = null;
   private WebcamMotionDetector detector     = null;
   private BufferedImage        detectionImage = null;
-  private BufferedImage        baselineImage = null;
+//  private BufferedImage        baselineImage = null;
   private String               detectionImagePath = null;
   private static final Logger  LOG          = LoggerFactory.getLogger(WebcamMotionPlugin.class);
 
@@ -72,6 +72,7 @@ public class WebcamMotionPlugin extends DevicePlugin
     {
       detector = new WebcamMotionDetector(webcam);
       detector.setAreaThreshold(Config.INSTANCE.getAreaThreshold());
+      detector.setMaxAreaThreshold(Config.INSTANCE.getMaxAreaThreshold());
       detector.setInertia(Config.INSTANCE.getInertia());
       detector.setInterval(Config.INSTANCE.getMotionInterval());
       detector.setPixelThreshold(Config.INSTANCE.getPixelThreshold());
@@ -107,18 +108,30 @@ public class WebcamMotionPlugin extends DevicePlugin
     public void motionDetected(WebcamMotionEvent wme)
     {
       LOG.info("Motion detected");
+      LOG.debug("Area affected by motion: {}%", wme.getArea());
+      LOG.debug("Motion COG: {}%", wme.getCog());
+      int sum = 0;
+      for(int t : wme.getSource().getThresholds()) {
+        LOG.trace("Threshold: {}", t);
+        sum += t;
+      }
+      double avgThreshold = sum/wme.getSource().getThresholds().size();
+      LOG.debug("Average Threshold: {}", avgThreshold);
+      String area = "Area affected by motion: " + wme.getArea();
+      String threshold = "Average threshold: " + avgThreshold;
+      String cog = "Motion COG: " + wme.getCog();
       StateDevice device = StateDeviceManager.INSTANCE.getDevice(myDeviceId);
       State newState;
       detectionImage = wme.getCurrentImage();
       detectionImagePath = saveImage(detectionImage);
       if (device.getState() == State.INACTIVE)
       {
-        sendAlert(detectionImagePath);
+        sendAlert(detectionImagePath, area + "<br/>" + threshold + "<br/>" + cog);
         newState = State.ACTIVE;
         StateDeviceManager.INSTANCE.updateStateDevice(myDeviceId, newState);
       }
-      baselineImage = wme.getPreviousImage();
-      saveImage(baselineImage);
+//      baselineImage = wme.getPreviousImage();
+//      saveImage(baselineImage);
     }
 
     public String saveImage(BufferedImage image)
@@ -153,7 +166,7 @@ public class WebcamMotionPlugin extends DevicePlugin
       return null;
     }
 
-    private boolean sendAlert(String imagePath)
+    private boolean sendAlert(String imagePath, String msg)
     {
       try
       {
@@ -164,6 +177,7 @@ public class WebcamMotionPlugin extends DevicePlugin
         String prettyDate = df.format(today.getTime());
         VisitorEmail email = new VisitorEmail();
         email.setDate(date);
+        email.setMsg(msg);
         email.setImagePath(imagePath);
         email.setSubject("Visitor at the Front Door " + prettyDate);
         Server.INSTANCE.sendEmail(email);

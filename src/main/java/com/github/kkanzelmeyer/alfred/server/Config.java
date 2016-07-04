@@ -28,6 +28,7 @@ public enum Config
   // motion detection algorithm settings
   private int mMotionInterval = 1000;
   private double mAreaThreshold = 10;
+  private double mMaxAreaThreshold = 100;
   private int mPixelThreshold = 40;
   private int mInertia = 1000;
   // Email saps
@@ -85,6 +86,10 @@ public enum Config
       val = (Long) json.get("areaThreshold");
       mAreaThreshold = val.doubleValue();
       LOG.debug("Area Threshold : {}", mAreaThreshold);
+
+      val = (Long) json.get("areaThresholdMax");
+      mMaxAreaThreshold = val.doubleValue();
+      LOG.debug("Max Area Threshold : {}", mMaxAreaThreshold);
 
       val = (Long) json.get("pixelThreshold");
       mPixelThreshold = val.intValue();
@@ -172,6 +177,10 @@ public enum Config
     return mAreaThreshold;
   }
 
+  public double getMaxAreaThreshold()
+  {
+    return mMaxAreaThreshold;
+  }
   public int getInertia()
   {
     return mInertia;
