@@ -77,6 +77,8 @@ public class WebcamMotionPlugin extends DevicePlugin
       detector.setInterval(Config.INSTANCE.getMotionInterval());
       detector.setPixelThreshold(Config.INSTANCE.getPixelThreshold());
       detector.addMotionListener(new MotionListener());
+      // create do-not-engage zone
+      detector.setDne(Config.INSTANCE.getDne());
       detector.start();
     }
 
