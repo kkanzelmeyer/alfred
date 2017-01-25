@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.kkanzelmeyer</groupId>
   <artifactId>alfred</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0</version>
   <packaging>jar</packaging>
   <name>alfred</name>
   <url>http://maven.apache.org</url>
@@ -38,15 +38,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.pi4j</groupId>
-      <artifactId>pi4j-core</artifactId>
-      <version>1.0</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.github.sarxos</groupId>
       <artifactId>webcam-capture</artifactId>
-      <version>0.3.11</version>
+      <version>0.3.12-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -120,6 +114,9 @@
               <key>value</key>
             </manifestEntries>
           </archive>
+          <exludes>
+            <exclude>src/main/resources/*</exclude>
+          </exludes>
         </configuration>
       </plugin>
 
@@ -134,6 +131,22 @@
           <testTarget>1.8</testTarget>
           <useIncrementalCompilation>true</useIncrementalCompilation>
         </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+        <configuration>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

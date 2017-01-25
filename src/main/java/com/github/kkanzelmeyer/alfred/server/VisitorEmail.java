@@ -32,6 +32,7 @@ public class VisitorEmail extends Email
     // first part (the html)
     BodyPart messageBodyPart = new MimeBodyPart();
     String htmlText = "<h3>" + getDisplayDate() + "</h3>"
+        + "<p>" + getMsg() + "<p>"
         + "<img src=\"cid:image\">";
     try
     {

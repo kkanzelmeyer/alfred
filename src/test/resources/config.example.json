@@ -5,8 +5,9 @@
     ],
     "imageDir" : "/path/to/save/images/Alfred/img",
     "motionInterval" : 500,
-    "areaThreshold" : 15,
-    "pixelThreshold" : 38,
+    "areaThreshold" : 5,
+    "areaThresholdMax" : 40,
+    "pixelThreshold" : 15,
     "inertia" : 500,
     "doorbellReset" : 300,
     "mail" : {

@@ -1,5 +1,6 @@
 package com.github.kkanzelmeyer.alfred.server;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
@@ -24,12 +25,14 @@ public enum Config
   private ArrayList<String> mEmails = null;
   private String mEnvironment = null;
   // timeout (seconds) before resetting the doorbell to INACTIVE
-  private int mDoorbellReset = 5;
+  private int mDoorbellReset = 180;
   // motion detection algorithm settings
   private int mMotionInterval = 1000;
   private double mAreaThreshold = 10;
+  private double mMaxAreaThreshold = 100;
   private int mPixelThreshold = 40;
   private int mInertia = 1000;
+  private Rectangle mDne;
   // Email saps
   private String auth = null;
   private String ttls = null;
@@ -86,6 +89,10 @@ public enum Config
       mAreaThreshold = val.doubleValue();
       LOG.debug("Area Threshold : {}", mAreaThreshold);
 
+      val = (Long) json.get("areaThresholdMax");
+      mMaxAreaThreshold = val.doubleValue();
+      LOG.debug("Max Area Threshold : {}", mMaxAreaThreshold);
+
       val = (Long) json.get("pixelThreshold");
       mPixelThreshold = val.intValue();
       LOG.debug("Pixel Threshold : {}", mPixelThreshold);
@@ -94,6 +101,20 @@ public enum Config
       mInertia = val.intValue();
       LOG.debug("Motion Inertia : {}", mInertia);
 
+      // dne
+      JSONObject dne = (JSONObject) json.get("dne");
+      Long dneX = (Long) dne.get("x");
+      Long dneY = (Long) dne.get("y");
+      Long dneWidth = (Long) dne.get("width");
+      Long dneHeight = (Long) dne.get("height");
+      mDne = new Rectangle(
+        dneX.intValue(),
+        dneY.intValue(),
+        dneWidth.intValue(),
+        dneHeight.intValue()
+      );
+      LOG.debug("Do not engage area : {}", mDne.toString());
+      
       LOG.debug("Finshed with json saps");
 
       // TODO set to environmental variable for deployment
@@ -172,6 +193,10 @@ public enum Config
     return mAreaThreshold;
   }
 
+  public double getMaxAreaThreshold()
+  {
+    return mMaxAreaThreshold;
+  }
   public int getInertia()
   {
     return mInertia;
@@ -180,6 +205,11 @@ public enum Config
   public int getPixelThreshold()
   {
     return mPixelThreshold;
+  }
+  
+  public Rectangle getDne()
+  {
+    return mDne;
   }
 
 }
