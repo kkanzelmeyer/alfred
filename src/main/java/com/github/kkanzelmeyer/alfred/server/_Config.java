@@ -10,7 +10,7 @@ public class _Config
   private String imageDir = "images/";
   private String environment = "";
   // timeout (seconds) before resetting the doorbell to INACTIVE
-  private int doorbellReset = 5;
+  private int doorbellReset = 600; // 10 minutes
   
   // motion detection algorithm settings
   private int motionInterval = 1000;
