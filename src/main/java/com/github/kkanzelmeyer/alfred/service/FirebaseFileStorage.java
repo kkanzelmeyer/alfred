@@ -38,14 +38,14 @@ public class FirebaseFileStorage implements IAlfredService {
     }
   }
   
-  public void saveFile(File file) {
+  public void saveImage(File file) {
     try {
       logger.debug("Saving file: {}", file.getName());
       byte[] bytes = Files.readAllBytes(file.toPath());
 
       String bucketName = "alfred-d5f8a.appspot.com";
       BlobId blobId = BlobId.of(bucketName, file.getName());
-      BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("*/*").build();
+      BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/jpeg").build();
       // create the blob in one request.
       storage.create(blobInfo, bytes);
     } catch (Exception e) {
