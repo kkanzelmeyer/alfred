@@ -35,6 +35,7 @@
           <target>1.8</target>
           <testSource>1.8</testSource>
           <testTarget>1.8</testTarget>
+          <useIncrementalCompilation>true</useIncrementalCompilation>
         </configuration>
       </plugin>
       <plugin>

@@ -24,6 +24,7 @@ import com.github.kkanzelmeyer.alfred.server.Server;
 import com.github.kkanzelmeyer.alfred.server.VisitorEmail;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamMotionDetector;
+import com.github.sarxos.webcam.WebcamMotionDetectorDefaultWithDNE;
 import com.github.sarxos.webcam.WebcamMotionEvent;
 import com.github.sarxos.webcam.WebcamMotionListener;
 import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
@@ -70,12 +71,13 @@ public class WebcamMotionPlugin extends DevicePlugin
     // motion detection
     if(detector == null)
     {
-      detector = new WebcamMotionDetector(webcam);
-      detector.setAreaThreshold(Config.INSTANCE.getAreaThreshold());
+      detector = new WebcamMotionDetector(webcam,
+          new WebcamMotionDetectorDefaultWithDNE(
+              Config.INSTANCE.getPixelThreshold(),
+              Config.INSTANCE.getAreaThreshold()),
+          Config.INSTANCE.getMotionInterval());
       detector.setMaxAreaThreshold(Config.INSTANCE.getMaxAreaThreshold());
       detector.setInertia(Config.INSTANCE.getInertia());
-      detector.setInterval(Config.INSTANCE.getMotionInterval());
-      detector.setPixelThreshold(Config.INSTANCE.getPixelThreshold());
       detector.addMotionListener(new MotionListener());
       // create do-not-engage zone
       detector.setDne(Config.INSTANCE.getDne());
