@@ -1,10 +1,14 @@
-package com.github.kkanzelmeyer.alfred.service;
+package com.github.kkanzelmeyer.alfred.storage;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+
+import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +20,7 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
-public class FirebaseFileStorage implements IAlfredService {
+public class FirebaseFileStorage implements IStorageService {
 
   private final Logger logger = LoggerFactory.getLogger(FirebaseFileStorage.class);
   private Storage storage = null;
@@ -28,30 +32,32 @@ public class FirebaseFileStorage implements IAlfredService {
 
     try {
       inputStream = new FileInputStream(file);
-      storage = StorageOptions.newBuilder()
-          .setProjectId("alfred-d5f8a")
-          .setCredentials(ServiceAccountCredentials.fromStream(inputStream))
-          .build()
-          .getService();
+      storage = StorageOptions.newBuilder().setProjectId("alfred-d5f8a")
+          .setCredentials(ServiceAccountCredentials.fromStream(inputStream)).build().getService();
     } catch (IOException e) {
       logger.error("error reading auth file", e);
     }
   }
-  
-  public void saveImage(File file) {
+
+  @Override
+  public String saveImage(BufferedImage img) {
     try {
-      logger.debug("Saving file: {}", file.getName());
-      byte[] bytes = Files.readAllBytes(file.toPath());
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      ImageIO.write(img, "jpg", baos);
+      byte[] bytes = baos.toByteArray();
+      // logger.debug("Saving file: {}", file.getName());
+      // byte[] bytes = Files.readAllBytes(file.toPath());
 
       String bucketName = "alfred-d5f8a.appspot.com";
-      BlobId blobId = BlobId.of(bucketName, file.getName());
+      BlobId blobId = BlobId.of(bucketName, StorageBridge.INSTANCE.getFileName());
       BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/jpeg").build();
       // create the blob in one request.
       storage.create(blobInfo, bytes);
+      return null;
     } catch (Exception e) {
       logger.error("error saving file", e);
     }
-
+    return null;
   }
 
 }

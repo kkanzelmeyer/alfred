@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.kkanzelmeyer.alfred.service.FirebaseFileStorage;
+import com.github.kkanzelmeyer.alfred.storage.FirebaseFileStorage;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
