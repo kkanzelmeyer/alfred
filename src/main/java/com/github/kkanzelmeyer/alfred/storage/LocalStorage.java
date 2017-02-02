@@ -21,7 +21,7 @@ public class LocalStorage implements IStorageService {
 
   }
   
-  public String saveImage(BufferedImage image)
+  public void saveImage(BufferedImage image)
   {
     // Save the image to a file
     try
@@ -37,20 +37,16 @@ public class LocalStorage implements IStorageService {
       }
       
       // Create file
-      df = new SimpleDateFormat("yyyyMMdd-kkmmss");
-      String date = df.format(today.getTime());
-      String filename = "visitor" + date + ".jpg";
+      String filename = StorageBridge.INSTANCE.getFileName();
       File outputfile = new File(directory, filename);
       logger.debug("Saving image: {}", outputfile.getAbsolutePath());
       ImageIO.write(image, "jpg", outputfile);
       logger.debug("Image saved: {}", outputfile.getAbsolutePath());
-      return outputfile.getAbsolutePath();
     }
     catch (Exception e)
     {
       logger.error("Trouble saving image", e);
     }
-    return null;
   }
 
 }

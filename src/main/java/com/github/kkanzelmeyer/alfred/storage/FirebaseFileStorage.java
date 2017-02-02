@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 
 import javax.imageio.ImageIO;
 
@@ -40,7 +39,7 @@ public class FirebaseFileStorage implements IStorageService {
   }
 
   @Override
-  public String saveImage(BufferedImage img) {
+  public void saveImage(BufferedImage img) {
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ImageIO.write(img, "jpg", baos);
@@ -53,11 +52,9 @@ public class FirebaseFileStorage implements IStorageService {
       BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/jpeg").build();
       // create the blob in one request.
       storage.create(blobInfo, bytes);
-      return null;
     } catch (Exception e) {
       logger.error("error saving file", e);
     }
-    return null;
   }
 
 }

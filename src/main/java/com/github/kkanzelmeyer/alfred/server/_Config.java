@@ -1,5 +1,8 @@
 package com.github.kkanzelmeyer.alfred.server;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * @author kevin
  *
@@ -21,6 +24,11 @@ public class _Config
   // Google Cloud info
   private String bucket = "";
   private String authFilePath = "";
+  
+  // services
+  private ArrayList<String> storageServices = new ArrayList<>(
+      Arrays.asList("com.github.kkanzelmeyer.alfred.storage.LocalStorage"));
+  
   public String getImageDir() {
     return imageDir;
   }
@@ -74,6 +82,12 @@ public class _Config
   }
   public void setAuthFilePath(String authFilePath) {
     this.authFilePath = authFilePath;
+  }
+  public ArrayList<String> getStorageServices() {
+    return storageServices;
+  }
+  public void setStorageServices(ArrayList<String> storageServices) {
+    this.storageServices = storageServices;
   }
   
   

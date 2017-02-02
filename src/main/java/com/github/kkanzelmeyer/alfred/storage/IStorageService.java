@@ -6,5 +6,5 @@ import com.github.kkanzelmeyer.alfred.service.IAlfredService;
 
 public interface IStorageService extends IAlfredService {
 
-  public String saveImage(BufferedImage img);
+  public void saveImage(BufferedImage img);
 }
