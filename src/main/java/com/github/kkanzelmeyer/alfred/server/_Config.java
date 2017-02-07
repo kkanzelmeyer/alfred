@@ -1,7 +1,16 @@
 package com.github.kkanzelmeyer.alfred.server;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 
 /**
  * @author kevin
@@ -90,6 +99,53 @@ public class _Config
     this.storageServices = storageServices;
   }
   
-  
+  /**
+   * This method saves the instance of a config object to a file in JSON. This
+   * can be helpful if you set different parameters during testing and want to
+   * quickly export the settings to a file.
+   * 
+   * @param path
+   *          The path with filename where you'd like to save the config
+   * @throws IOException
+   */
+  public void exportAsJsonFile(String path) throws IOException {
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    String json = gson.toJson(this);
+
+    FileWriter writer = new FileWriter(path);
+    writer.write(json);
+    writer.close();
+  }
+
+  /**
+   * This static method creates a Sap object of the desired type from a file at
+   * the specified path
+   * 
+   * @param path
+   *          The path to the sap file
+   * @return saps The saps object
+   * @throws FileNotFoundException
+   */
+  public static _Config createConfig(String path) throws FileNotFoundException {
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    BufferedReader br = new BufferedReader(new FileReader(path));
+
+    _Config saps = gson.fromJson(br, _Config.class);
+    return saps;
+  }
+
+  /**
+   * This static method creates a Sap object of the desired type from an input
+   * Json object
+   * 
+   * @param json
+   *          The json representation of the sap object
+   * @return saps The saps object
+   */
+  public static _Config createSaps(JsonElement json) {
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    _Config saps = gson.fromJson(json, _Config.class);
+    return saps;
+  }
 
 }

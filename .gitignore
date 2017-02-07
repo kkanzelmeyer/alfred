@@ -8,4 +8,5 @@ logback.production.xml
 /dist/
 log/
 firebase-config.json
-
+build/
+.gradle/
