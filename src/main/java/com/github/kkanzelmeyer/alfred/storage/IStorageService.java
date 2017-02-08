@@ -2,9 +2,11 @@ package com.github.kkanzelmeyer.alfred.storage;
 
 import java.awt.image.BufferedImage;
 
-import com.github.kkanzelmeyer.alfred.alert.IAlfredService;
+import com.github.kkanzelmeyer.alfred.IAlfredService;
 
 public interface IStorageService extends IAlfredService {
 
-  public void saveImage(BufferedImage img);
+  String saveImage(BufferedImage img);
+
+  ServiceType getType();
 }

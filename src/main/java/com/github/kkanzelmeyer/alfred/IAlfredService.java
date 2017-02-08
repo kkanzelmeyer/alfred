@@ -1,4 +1,4 @@
-package com.github.kkanzelmeyer.alfred.alert;
+package com.github.kkanzelmeyer.alfred;
 
 public interface IAlfredService {
   public void setup();

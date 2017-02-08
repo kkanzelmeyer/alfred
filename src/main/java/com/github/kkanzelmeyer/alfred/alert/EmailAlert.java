@@ -13,6 +13,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.github.kkanzelmeyer.alfred.storage.ServiceType;
 import org.bridj.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import com.github.kkanzelmeyer.alfred.server.VisitorEmail;
 public class EmailAlert implements IAlertService {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final ServiceType type = ServiceType.LOCAL;
 
   public boolean sendAlert(String imagePath, String msg) {
     logger.debug("Sending alert");
@@ -44,6 +46,16 @@ public class EmailAlert implements IAlertService {
       logger.error("Unable to send image as alert", e);
     }
     return false;
+  }
+
+  @Override
+  public boolean sendAlert(String msg) {
+    return false;
+  }
+
+  @Override
+  public ServiceType getType() {
+    return type;
   }
 
   /**

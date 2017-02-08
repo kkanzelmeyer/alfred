@@ -16,12 +16,13 @@ import com.github.kkanzelmeyer.alfred.server.Config;
 public class LocalStorage implements IStorageService {
   
   private Logger logger = LoggerFactory.getLogger(LocalStorage.class);
+  private final ServiceType type = ServiceType.LOCAL;
   
   public void setup() {
 
   }
   
-  public void saveImage(BufferedImage image)
+  public String saveImage(BufferedImage image)
   {
     // Save the image to a file
     try
@@ -42,11 +43,18 @@ public class LocalStorage implements IStorageService {
       logger.debug("Saving image: {}", outputfile.getAbsolutePath());
       ImageIO.write(image, "jpg", outputfile);
       logger.debug("Image saved: {}", outputfile.getAbsolutePath());
+      return outputfile.getAbsolutePath();
     }
     catch (Exception e)
     {
       logger.error("Trouble saving image", e);
     }
+    return null;
+  }
+
+  @Override
+  public ServiceType getType() {
+    return type;
   }
 
 }

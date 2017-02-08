@@ -22,6 +22,7 @@ import com.google.cloud.storage.StorageOptions;
 public class FirebaseFileStorage implements IStorageService {
 
   private final Logger logger = LoggerFactory.getLogger(FirebaseFileStorage.class);
+  private final ServiceType type = ServiceType.FIREBASE;
   private Storage storage = null;
 
   @Override
@@ -39,7 +40,7 @@ public class FirebaseFileStorage implements IStorageService {
   }
 
   @Override
-  public void saveImage(BufferedImage img) {
+  public String saveImage(BufferedImage img) {
     try {
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       ImageIO.write(img, "jpg", baos);
@@ -51,10 +52,16 @@ public class FirebaseFileStorage implements IStorageService {
       BlobId blobId = BlobId.of(bucketName, StorageBridge.INSTANCE.getFileName());
       BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/jpeg").build();
       // create the blob in one request.
-      storage.create(blobInfo, bytes);
+      return storage.create(blobInfo, bytes).getSelfLink();
     } catch (Exception e) {
       logger.error("error saving file", e);
     }
+    return null;
+  }
+
+  @Override
+  public ServiceType getType() {
+    return type;
   }
 
 }

@@ -2,10 +2,11 @@ config.json
 target/
 .project
 .settings/
+.idea/
 .DS_Store
 logback.xml
 logback.production.xml
-/dist/
+dist/
 log/
 firebase-config.json
 build/
