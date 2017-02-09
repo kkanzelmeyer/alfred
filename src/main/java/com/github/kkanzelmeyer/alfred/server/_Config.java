@@ -1,16 +1,14 @@
 package com.github.kkanzelmeyer.alfred.server;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+
+import java.awt.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author kevin
@@ -19,25 +17,37 @@ import com.google.gson.JsonElement;
 public class _Config
 {
 
-  private String imageDir = "images/";
+  private String imageDir = "Alfred/images/";
   private String environment = "";
+  private List<String> emailRecipients = new ArrayList<>();
   // timeout (seconds) before resetting the doorbell to INACTIVE
   private int doorbellReset = 600; // 10 minutes
   
   // motion detection algorithm settings
   private int motionInterval = 1000;
   private double areaThreshold = 10;
+  private double maxAreaThreshold = 100;
   private int pixelThreshold = 40;
   private int inertia = 1000;
+  private Rectangle dne = new Rectangle(0, 0);
+
+  // Email saps
+  private String auth = "";
+  private String ttls = "";
+  private String host = "";
+  private String port = "";
+  private String username = "";
+  private String token = "";
   
   // Google Cloud info
   private String bucket = "";
   private String authFilePath = "";
+  private String fcmServerKey = "";
   
   // services
   private ArrayList<String> storageServices = new ArrayList<>(
       Arrays.asList("com.github.kkanzelmeyer.alfred.storage.LocalStorage"));
-  
+
   public String getImageDir() {
     return imageDir;
   }
@@ -98,7 +108,15 @@ public class _Config
   public void setStorageServices(ArrayList<String> storageServices) {
     this.storageServices = storageServices;
   }
-  
+
+  public List<String> getEmailRecipients() {
+    return emailRecipients;
+  }
+
+  public String getFcmServerKey() {
+    return fcmServerKey;
+  }
+
   /**
    * This method saves the instance of a config object to a file in JSON. This
    * can be helpful if you set different parameters during testing and want to
@@ -148,4 +166,11 @@ public class _Config
     return saps;
   }
 
+  public Rectangle getDne() {
+    return dne;
+  }
+
+  public double getMaxAreaThreshold() {
+    return maxAreaThreshold;
+  }
 }

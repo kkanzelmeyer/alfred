@@ -1,26 +1,21 @@
 package com.github.kkanzelmeyer.alfred.plugins;
 
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
-import java.util.*;
-
-import com.github.kkanzelmeyer.alfred.storage.StorageBridge;
-import com.github.kkanzelmeyer.alfred.storage.ServiceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.kkanzelmeyer.alfred.alert.AlertBridge;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDevice;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceHandler;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceManager;
 import com.github.kkanzelmeyer.alfred.datamodel.enums.State;
-import com.github.kkanzelmeyer.alfred.server.Config;
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamMotionDetector;
-import com.github.sarxos.webcam.WebcamMotionDetectorDefaultWithDNE;
-import com.github.sarxos.webcam.WebcamMotionEvent;
-import com.github.sarxos.webcam.WebcamMotionListener;
+import com.github.kkanzelmeyer.alfred.server.Server;
+import com.github.kkanzelmeyer.alfred.storage.ServiceType;
+import com.github.kkanzelmeyer.alfred.storage.StorageBridge;
+import com.github.sarxos.webcam.*;
 import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.*;
 
 public class WebcamMotionPlugin extends DevicePlugin {
 
@@ -56,14 +51,14 @@ public class WebcamMotionPlugin extends DevicePlugin {
     // motion detection
     if (detector == null) {
       detector = new WebcamMotionDetector(webcam,
-          new WebcamMotionDetectorDefaultWithDNE(Config.INSTANCE.getPixelThreshold(),
-              Config.INSTANCE.getAreaThreshold()),
-          Config.INSTANCE.getMotionInterval());
-      detector.setMaxAreaThreshold(Config.INSTANCE.getMaxAreaThreshold());
-      detector.setInertia(Config.INSTANCE.getInertia());
+                                             new WebcamMotionDetectorDefaultWithDNE(Server.INSTANCE.getConfig().getPixelThreshold(),
+                                                                                       Server.INSTANCE.getConfig().getAreaThreshold()),
+                                             Server.INSTANCE.getConfig().getMotionInterval());
+      detector.setMaxAreaThreshold(Server.INSTANCE.getConfig().getMaxAreaThreshold());
+      detector.setInertia(Server.INSTANCE.getConfig().getInertia());
       detector.addMotionListener(new MotionListener());
       // create do-not-engage zone
-      detector.setDne(Config.INSTANCE.getDne());
+      detector.setDne(Server.INSTANCE.getConfig().getDne());
       detector.start();
     }
 
@@ -141,7 +136,7 @@ public class WebcamMotionPlugin extends DevicePlugin {
 
     public void startResetTimer(StateDevice device) {
       Calendar calendar = Calendar.getInstance();
-      calendar.add(Calendar.SECOND, Config.INSTANCE.getDoorbellReset());
+      calendar.add(Calendar.SECOND, Server.INSTANCE.getConfig().getDoorbellReset());
       Date endTime = calendar.getTime();
       logger.info("Scheduling reset timer");
       // timer.schedule(new DoorbellResetTask(device), endTime);

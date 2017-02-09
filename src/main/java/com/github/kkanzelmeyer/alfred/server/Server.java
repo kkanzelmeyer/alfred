@@ -7,6 +7,12 @@ public enum Server
 {
   INSTANCE;
 
+  private final _Config config = new _Config();
+
+  public _Config getConfig() {
+    return config;
+  }
+
   private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
   /**
