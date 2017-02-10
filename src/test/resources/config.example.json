@@ -1,6 +1,6 @@
 {
   "imageDir": "Alfred/images/",
-  "environment": ""
+  "environment": "",
   "doorbellReset": 600,
   "motionInterval": 1000,
   "areaThreshold": 10.0,
