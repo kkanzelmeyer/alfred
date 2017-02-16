@@ -32,8 +32,9 @@ public class FirebaseAlert implements IAlertService {
         });
     try {
 
+      String to = Server.INSTANCE.getConfig().deviceTokens.get(0);
       JsonHttpContent content = new JsonHttpContent(
-                                                       new JacksonFactory(), new FirebaseNotification("ABC", new Noty("Kevin", 30)));
+          new JacksonFactory(), new FirebaseNotification(to, new Noty("yo dawg", "wat", "fcm.ACTION.HELLO")));
       log.info("content: {}", content.getData());
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType("application/json");
@@ -59,35 +60,46 @@ public class FirebaseAlert implements IAlertService {
 
   public class FirebaseNotification {
     @Key
-    private String to;
-    @Key
-    private Noty data;
+    public String to;
 
-    public FirebaseNotification(String to, Noty data) {
+    @Key
+    public boolean content_available = true;
+
+    @Key
+    public Noty notification;
+
+    public FirebaseNotification(String to, Noty notification) {
       this.to = to;
-      this.data = data;
+      this.notification = notification;
     }
 
     public String toString() {
-      return "\nto:\t" + to + "\ndata:\n" + data;
+      return "\nto:\t" + to + "\nnotification:\n" + notification;
     }
   }
 
   public class Noty {
     @Key
-    private String name;
+    public String title;
 
     @Key
-    private int age;
+    public String body;
 
-    public Noty(String name, int age) {
-      this.name = name;
-      this.age = age;
+    @Key
+    public String sound = "default";
+
+    @Key
+    public String click_action;
+
+    public Noty(String title, String body, String click) {
+      this.title = title;
+      this.body = body;
+      this.click_action = click;
     }
 
     @Override
     public String toString() {
-      return "\tname: " + name + "\n\tage: " + age;
+      return "\ttitle: " + title + "\n\tbody: " + body;
     }
   }
 
