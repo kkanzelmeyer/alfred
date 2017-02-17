@@ -29,8 +29,8 @@ public enum AlertBridge implements IAlfredService {
    * @return
    */
   public boolean sendAlert(Map<ServiceType, String> imagePaths, String msg) {
-    logger.debug("Sending alert");
     for (IAlertService service : alertServices) {
+      logger.debug("Sending alert to {}", service.getClass());
       service.sendAlert(imagePaths.get(service.getType()), msg);
     }
     return false;
@@ -41,8 +41,8 @@ public enum AlertBridge implements IAlfredService {
    * @return
    */
   public boolean sendAlert(String msg) {
-    logger.debug("Sending alert");
     for (IAlertService service : alertServices) {
+      logger.debug("Sending alert to {}", service.getClass());
       service.sendAlert(msg);
     }
     return false;

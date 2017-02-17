@@ -1,215 +1,113 @@
 package com.github.kkanzelmeyer.alfred.server;
 
-import java.awt.Rectangle;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+
+import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.github.kkanzelmeyer.alfred.utils.ParseJsonFile;
 
 /**
  * @author kevin
- *
  */
-public enum Config
-{
+public class Config {
 
-  INSTANCE;
-
-  private String mImageDir = null;
-  private ArrayList<String> mEmails = null;
-  private String mEnvironment = null;
+  public final String imageDir = "";
+  public final String environment = "development";
+  public final ArrayList<String> emailRecipients = new ArrayList<>();
   // timeout (seconds) before resetting the doorbell to INACTIVE
-  private int mDoorbellReset = 180;
+  public final int doorbellReset = 600; // 10 minutes
+
   // motion detection algorithm settings
-  private int mMotionInterval = 1000;
-  private double mAreaThreshold = 10;
-  private double mMaxAreaThreshold = 100;
-  private int mPixelThreshold = 40;
-  private int mInertia = 1000;
-  private Rectangle mDne;
+  public final int motionInterval = 1000;
+  public final double areaThreshold = 10;
+  public final double maxAreaThreshold = 100;
+  public final int pixelThreshold = 40;
+  public final int inertia = 1000;
+  public final Rectangle dne = new Rectangle(0, 0);
+
   // Email saps
-  private String auth = null;
-  private String ttls = null;
-  private String host = null;
-  private String port = null;
-  private String username = null;
-  private String token = null;
-  private Properties mProperties = null;
+  public final String auth = "";
+  public final String ttls = "";
+  public final String host = "";
+  public final String port = "";
+  public final String username = "";
+  public final String token = "";
 
-  private final Logger LOG = LoggerFactory.getLogger(Config.class);
+  // Google Cloud Storage info
+  public final String bucket = "";
+  public final String projectId = "";
+  public final String authFilePath = "";
 
-  private Config()
-  {
-    mEmails = new ArrayList<String>();
-    try
-    {
-      JSONObject json = ParseJsonFile.toObject("config.json");
+  // FCM info
+  public final String fcmServerKey = "";
+  public final List<String> deviceTokens = null;
 
-      LOG.debug("Saving SAPS");
+  // services
+  public final ArrayList<String> storageServices = new ArrayList<>(
+      Arrays.asList("com.github.kkanzelmeyer.alfred.storage.LocalStorage"));
 
-      mImageDir = (String) json.get("imageDir");
-      LOG.debug("Image Directory: {}", mImageDir);
+  public final ArrayList<String> alertServices = null;
 
-      Long val = ((Long) json.get("doorbellReset"));
-      mDoorbellReset = val.intValue();
-      LOG.debug("Doorbell reset : {}", mDoorbellReset);
-
-      JSONArray jArr = (JSONArray) json.get("emails");
-      Iterator<?> iterator = jArr.iterator();
-      while (iterator.hasNext())
-      {
-        String email = (String) iterator.next();
-        LOG.debug("Adding email: {}", email);
-        mEmails.add(email);
-      }
-
-      // mail settings
-      LOG.debug("Loading mail settings");
-      JSONObject mail = (JSONObject) json.get("mail");
-      JSONObject smtp = (JSONObject) mail.get("smtp");
-      auth = (String) smtp.get("auth");
-      ttls = (String) smtp.get("ttls");
-      host = (String) smtp.get("host");
-      port = (String) smtp.get("port");
-      username = (String) mail.get("username");
-      token = (String) mail.get("token");
-
-      // webcam algorithm settings
-      val = (Long) json.get("motionInterval");
-      mMotionInterval = val.intValue();
-      LOG.debug("Motion Interval : {}", mMotionInterval);
-
-      val = (Long) json.get("areaThreshold");
-      mAreaThreshold = val.doubleValue();
-      LOG.debug("Area Threshold : {}", mAreaThreshold);
-
-      val = (Long) json.get("areaThresholdMax");
-      mMaxAreaThreshold = val.doubleValue();
-      LOG.debug("Max Area Threshold : {}", mMaxAreaThreshold);
-
-      val = (Long) json.get("pixelThreshold");
-      mPixelThreshold = val.intValue();
-      LOG.debug("Pixel Threshold : {}", mPixelThreshold);
-
-      val = (Long) json.get("inertia");
-      mInertia = val.intValue();
-      LOG.debug("Motion Inertia : {}", mInertia);
-
-      // dne
-      JSONObject dne = (JSONObject) json.get("dne");
-      Long dneX = (Long) dne.get("x");
-      Long dneY = (Long) dne.get("y");
-      Long dneWidth = (Long) dne.get("width");
-      Long dneHeight = (Long) dne.get("height");
-      mDne = new Rectangle(
-        dneX.intValue(),
-        dneY.intValue(),
-        dneWidth.intValue(),
-        dneHeight.intValue()
-      );
-      LOG.debug("Do not engage area : {}", mDne.toString());
-      
-      LOG.debug("Finshed with json saps");
-
-      // TODO set to environmental variable for deployment
-      // mEnvironment = System.getenv("JAVA_ENV");
-      mEnvironment = "production";
-
-    }
-    catch (Exception e)
-    {
-      LOG.error("Config Error", e);
-    }
-    LOG.debug("Finished loading saps");
+  public Properties getEmailProperties() {
+    Properties props = new Properties();
+    props.put("mail.smtp.auth", auth);
+    props.put("mail.smtp.starttls.enable", ttls);
+    props.put("mail.smtp.host", host);
+    props.put("mail.smtp.port", port);
+    props.put("mail.username", username);
+    props.put("mail.token", token);
+    props.put("mail.smtp.connectiontimeout", "3000");
+    return props;
   }
 
-  public String getImageDir()
-  {
-    return mImageDir;
+  /**
+   * This method saves the instance of a config object to a file in JSON. This
+   * can be helpful if you set different parameters during testing and want to
+   * quickly export the settings to a file.
+   *
+   * @param path The path with filename where you'd like to save the config
+   * @throws IOException
+   */
+  public void exportAsJsonFile(String path) throws IOException {
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    String json = gson.toJson(this);
+
+    FileWriter writer = new FileWriter(path);
+    writer.write(json);
+    writer.close();
   }
 
-  public ArrayList<String> getEmails()
-  {
-    return mEmails;
+  /**
+   * This static method creates a Sap object of the desired type from a file at
+   * the specified path
+   *
+   * @param path The path to the sap file
+   * @return saps The saps object
+   * @throws FileNotFoundException
+   */
+  public static Config createConfig(String path) throws FileNotFoundException {
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    BufferedReader br = new BufferedReader(new FileReader(path));
+
+    Config saps = gson.fromJson(br, Config.class);
+    return saps;
   }
 
-  public String getEnvironment()
-  {
-    return mEnvironment;
+  /**
+   * This static method creates a Sap object of the desired type from an input
+   * Json object
+   *
+   * @param json The json representation of the sap object
+   * @return saps The saps object
+   */
+  public static Config createSaps(JsonElement json) {
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    Config saps = gson.fromJson(json, Config.class);
+    return saps;
   }
-
-  public int getDoorbellReset()
-  {
-    return mDoorbellReset;
-  }
-
-  public void setDoorbellReset(int val)
-  {
-    mDoorbellReset = val;
-  }
-
-  public Properties getEmailProperties()
-  {
-    if (mProperties == null)
-    {
-      LOG.debug("Creating mail properties");
-      Properties props = new Properties();
-      props.put("mail.smtp.auth", auth);
-      props.put("mail.smtp.starttls.enable", ttls);
-      props.put("mail.smtp.host", host);
-      props.put("mail.smtp.port", port);
-      props.put("mail.username", username);
-      props.put("mail.token", token);
-      props.put("mail.smtp.connectiontimeout", "3000");
-      mProperties = props;
-    }
-    LOG.debug(mProperties.toString());
-    return mProperties;
-  }
-
-  public String getUsername()
-  {
-    return username;
-  }
-
-  public String getToken()
-  {
-    return token;
-  }
-
-  public int getMotionInterval()
-  {
-    return mMotionInterval;
-  }
-
-  public double getAreaThreshold()
-  {
-    return mAreaThreshold;
-  }
-
-  public double getMaxAreaThreshold()
-  {
-    return mMaxAreaThreshold;
-  }
-  public int getInertia()
-  {
-    return mInertia;
-  }
-
-  public int getPixelThreshold()
-  {
-    return mPixelThreshold;
-  }
-  
-  public Rectangle getDne()
-  {
-    return mDne;
-  }
-
 }

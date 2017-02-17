@@ -5,7 +5,7 @@ import com.github.kkanzelmeyer.alfred.datamodel.StateDevice;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceHandler;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceManager;
 import com.github.kkanzelmeyer.alfred.datamodel.enums.State;
-import com.github.kkanzelmeyer.alfred.server.Server;
+import com.github.kkanzelmeyer.alfred.datastore.Store;
 import com.github.kkanzelmeyer.alfred.storage.ServiceType;
 import com.github.kkanzelmeyer.alfred.storage.StorageBridge;
 import com.github.sarxos.webcam.*;
@@ -27,12 +27,11 @@ public class WebcamMotionPlugin extends DevicePlugin {
   private BufferedImage detectionImage = null;
   // private BufferedImage baselineImage = null;
   private String detectionImagePath = null;
-  private static final Logger logger = LoggerFactory.getLogger(WebcamMotionPlugin.class);
+  private final Logger log = LoggerFactory.getLogger(WebcamMotionPlugin.class);
 
   public WebcamMotionPlugin(StateDevice device) {
     super(device);
-    // TODO make webcam device a SAP
-    logger.debug("Creating webcam instance");
+    log.debug("Creating webcam instance");
     Webcam.setDriver(new V4l4jDriver()); // this is important
     webcam = Webcam.getDefault();
     Dimension[] myResolution = new Dimension[] { new Dimension(640, 360), new Dimension(1280, 720) };
@@ -46,19 +45,19 @@ public class WebcamMotionPlugin extends DevicePlugin {
 
   @Override
   public void activate() {
-    logger.debug("Activating plugin: {}", CLASSNAME);
+    log.debug("Activating plugin: {}", CLASSNAME);
 
     // motion detection
     if (detector == null) {
       detector = new WebcamMotionDetector(webcam,
-                                             new WebcamMotionDetectorDefaultWithDNE(Server.INSTANCE.getConfig().getPixelThreshold(),
-                                                                                       Server.INSTANCE.getConfig().getAreaThreshold()),
-                                             Server.INSTANCE.getConfig().getMotionInterval());
-      detector.setMaxAreaThreshold(Server.INSTANCE.getConfig().getMaxAreaThreshold());
-      detector.setInertia(Server.INSTANCE.getConfig().getInertia());
+          new WebcamMotionDetectorDefaultWithDNE(Store.INSTANCE.getConfig().pixelThreshold,
+              Store.INSTANCE.getConfig().areaThreshold),
+          Store.INSTANCE.getConfig().motionInterval);
+      detector.setMaxAreaThreshold(Store.INSTANCE.getConfig().maxAreaThreshold);
+      detector.setInertia(Store.INSTANCE.getConfig().inertia);
       detector.addMotionListener(new MotionListener());
       // create do-not-engage zone
-      detector.setDne(Server.INSTANCE.getConfig().getDne());
+      detector.setDne(Store.INSTANCE.getConfig().dne);
       detector.start();
     }
 
@@ -75,7 +74,7 @@ public class WebcamMotionPlugin extends DevicePlugin {
   @Override
   public void deactivate() {
     timer.cancel();
-    logger.trace("Deactivating plugin {}", CLASSNAME);
+    log.trace("Deactivating plugin {}", CLASSNAME);
     StateDeviceManager.INSTANCE.removeDeviceHandler(stateHandler);
     stateHandler = null;
     detector.stop();
@@ -85,16 +84,16 @@ public class WebcamMotionPlugin extends DevicePlugin {
 
     @Override
     public void motionDetected(WebcamMotionEvent wme) {
-      logger.info("Motion detected");
-      logger.debug("Area affected by motion: {}%", wme.getArea());
-      logger.debug("Motion COG: {}%", wme.getCog());
+      log.debug("Motion detected");
+      log.debug("Area affected by motion: {}%", wme.getArea());
+      log.debug("Motion COG: {}%", wme.getCog());
       int sum = 0;
       for (int t : wme.getSource().getThresholds()) {
-        logger.trace("Threshold: {}", t);
+        log.trace("Threshold: {}", t);
         sum += t;
       }
       double avgThreshold = sum / wme.getSource().getThresholds().size();
-      logger.debug("Average Threshold: {}", avgThreshold);
+      log.debug("Average Threshold: {}", avgThreshold);
       String area = "Area affected by motion: " + wme.getArea();
       String threshold = "Average threshold: " + avgThreshold;
       String cog = "Motion COG: " + wme.getCog();
@@ -121,12 +120,12 @@ public class WebcamMotionPlugin extends DevicePlugin {
 
     @Override
     public void onUpdateDevice(StateDevice device) {
-      logger.debug("State update received by {}", CLASSNAME);
+      log.debug("State update received by {}", CLASSNAME);
       if (device.getState() == State.ACTIVE) {
-        logger.debug("State set to {}", device.getState());
+        log.debug("State set to {}", device.getState());
         startResetTimer(device);
       } else {
-        logger.trace("Resetting status");
+        log.trace("Resetting status");
       }
     }
 
@@ -136,14 +135,14 @@ public class WebcamMotionPlugin extends DevicePlugin {
 
     public void startResetTimer(StateDevice device) {
       Calendar calendar = Calendar.getInstance();
-      calendar.add(Calendar.SECOND, Server.INSTANCE.getConfig().getDoorbellReset());
+      calendar.add(Calendar.SECOND, Store.INSTANCE.getConfig().doorbellReset);
       Date endTime = calendar.getTime();
-      logger.info("Scheduling reset timer");
+      log.info("Scheduling reset timer");
       // timer.schedule(new DoorbellResetTask(device), endTime);
       timer.schedule(new TimerTask() {
         @Override
         public void run() {
-          logger.info("Resetting {}", device.getName());
+          log.info("Resetting {}", device.getName());
           StateDeviceManager.INSTANCE.updateStateDevice(device.getId(), State.INACTIVE);
         }
 

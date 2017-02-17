@@ -1,8 +1,11 @@
 package com.github.kkanzelmeyer.alfred.alert;
 
-import com.github.kkanzelmeyer.alfred.server.Server;
+import com.github.kkanzelmeyer.alfred.datastore.Store;
 import com.github.kkanzelmeyer.alfred.storage.ServiceType;
-import com.google.api.client.http.*;
+import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpHeaders;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
@@ -15,6 +18,18 @@ public class FirebaseAlert implements IAlertService {
 
   private final ServiceType type = ServiceType.FIREBASE;
   private final Logger log = LoggerFactory.getLogger(getClass());
+  HttpRequestFactory requestFactory = null;
+
+
+  @Override
+  public void setup() {
+    if (requestFactory == null) {
+      requestFactory =
+          new NetHttpTransport().createRequestFactory(
+              (HttpRequest request) -> request.setParser(new JsonObjectParser(new JacksonFactory()))
+          );
+    }
+  }
 
   @Override
   public boolean sendAlert(String imagePath, String msg) {
@@ -23,22 +38,14 @@ public class FirebaseAlert implements IAlertService {
 
   @Override
   public boolean sendAlert(String msg) {
-    HttpRequestFactory requestFactory =
-        new NetHttpTransport().createRequestFactory(new HttpRequestInitializer() {
-          @Override
-          public void initialize(HttpRequest request) {
-            request.setParser(new JsonObjectParser(new JacksonFactory()));
-          }
-        });
     try {
-
-      String to = Server.INSTANCE.getConfig().deviceTokens.get(0);
+      String to = Store.INSTANCE.getConfig().deviceTokens.get(0);
       JsonHttpContent content = new JsonHttpContent(
           new JacksonFactory(), new FirebaseNotification(to, new Noty("yo dawg", "wat", "fcm.ACTION.HELLO")));
       log.info("content: {}", content.getData());
       HttpHeaders headers = new HttpHeaders();
       headers.setContentType("application/json");
-      headers.setAuthorization("key=" + Server.INSTANCE.getConfig().getFcmServerKey());
+      headers.setAuthorization("key=" + Store.INSTANCE.getConfig().fcmServerKey);
       headers.setAccept("application/json");
       log.info("auth: {}", headers.getAuthorization());
       HttpRequest request = requestFactory.buildPostRequest(
@@ -57,6 +64,7 @@ public class FirebaseAlert implements IAlertService {
   public ServiceType getType() {
     return type;
   }
+
 
   public class FirebaseNotification {
     @Key

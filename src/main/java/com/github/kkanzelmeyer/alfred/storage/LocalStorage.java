@@ -1,17 +1,15 @@
 package com.github.kkanzelmeyer.alfred.storage;
 
+import com.github.kkanzelmeyer.alfred.datastore.Store;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-
-import javax.imageio.ImageIO;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.github.kkanzelmeyer.alfred.server.Config;
 
 public class LocalStorage implements IStorageService {
   
@@ -31,7 +29,7 @@ public class LocalStorage implements IStorageService {
       Calendar today = Calendar.getInstance();
       DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
       String dayFormat = df.format(today.getTime());
-      File directory = new File(Config.INSTANCE.getImageDir()+ "/" + dayFormat);
+      File directory = new File(Store.INSTANCE.getConfig().imageDir + "/" + dayFormat);
       if(!directory.exists())
       {
         directory.mkdirs();

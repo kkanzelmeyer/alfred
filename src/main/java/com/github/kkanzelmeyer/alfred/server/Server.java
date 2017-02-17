@@ -7,12 +7,6 @@ public enum Server
 {
   INSTANCE;
 
-  private _Config config = new _Config();
-
-  public _Config getConfig() {
-    return config;
-  }
-
   private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
   /**
@@ -26,7 +20,4 @@ public enum Server
     LOG.info("Starting Alfred Server");
   }
 
-  public void setConfig(_Config config) {
-    this.config = config;
-  }
 }

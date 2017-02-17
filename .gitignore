@@ -11,3 +11,4 @@ log/
 firebase-config.json
 build/
 .gradle/
+/bin/
