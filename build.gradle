@@ -18,6 +18,15 @@ repositories {
     maven { url "http://repo.maven.apache.org/maven2" }
 }
 
+sourceSets{
+  test {
+    resources {
+      srcDir "src/test/resources"
+    }
+  }
+}
+
+
 dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
@@ -37,27 +46,11 @@ dependencies {
 
 mainClassName = "com.github.kkanzelmeyer.alfred.App"
 
-task createImgDir {
-    def dir = file("$buildDir/images")
-    outputs.dir dir
-    doLast {
-        dir.mkdirs()
-        new File(dir, "readme.txt").write("Read me!")
-    }
-}
-
-sourceSets{
-test {
-  resources {
-    srcDir "src/test/resources"
-  }
-}
-
 distributions {
     main {
         contents {
-            from(createImgDir) {
-                into "images"
+            from("src/test/resources") {
+               into "config"
             }
         }
     }

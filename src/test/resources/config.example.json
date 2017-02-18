@@ -1,28 +1,33 @@
 {
-  "imageDir": "Alfred/images/",
-  "environment": "",
-  "doorbellReset": 600,
-  "motionInterval": 1000,
-  "areaThreshold": 10.0,
-  "maxAreaThreshold": 100.0,
-  "pixelThreshold": 40,
-  "inertia": 1000,
-  "dne": {
-    "x": 0,
-    "y": 0,
-    "width": 0,
-    "height": 0
-  },
-  "auth" : "true",
-  "ttls" : "true",
-  "host" : "smtp.gmail.com",
-  "port" : "587",
-  "username" : "youremailaddress",
-  "token" : "youremailtoken",
-  "bucket": "",
-  "authFilePath": "",
-  "fcmServerKey": "yourfcmkey",
-  "storageServices": [
-    "com.github.kkanzelmeyer.alfred.storage.LocalStorage"
-  ]
+    "imageDir": "",
+    "environment": "development",
+    "emailRecipients": [],
+    "doorbellReset": 600,
+    "motionInterval": 1000,
+    "areaThreshold": 10.0,
+    "maxAreaThreshold": 100.0,
+    "pixelThreshold": 40,
+    "inertia": 1000,
+    "dne": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0
+    },
+    "auth": "",
+    "ttls": "",
+    "host": "",
+    "port": "",
+    "username": "",
+    "token": "",
+    "bucket": "",
+    "projectId": "",
+    "authFilePath": "",
+    "fcmServerKey": "",
+    "deviceTokens": [],
+    "fcmServerKey": "",
+    "storageServices": [
+        "com.github.kkanzelmeyer.alfred.storage.LocalStorage"
+    ],
+    "alertServices": []
 }
