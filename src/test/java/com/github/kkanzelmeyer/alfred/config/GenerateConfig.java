@@ -1,9 +1,9 @@
 package com.github.kkanzelmeyer.alfred.config;
 
-import com.github.kkanzelmeyer.alfred.server.Config;
-
 import java.io.File;
 import java.io.IOException;
+
+import com.github.kkanzelmeyer.alfred.server.Config;
 
 /**
  * Created by kevinkanzelmeyer on 2/8/17.
@@ -23,7 +23,7 @@ public class GenerateConfig {
     // create model sap files
     Config config = new Config();
     try {
-      config.exportAsJsonFile(directory + "config.json");
+      config.exportAsJsonFile(directory + "alfred-config.json");
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

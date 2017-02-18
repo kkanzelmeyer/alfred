@@ -1,14 +1,19 @@
 package com.github.kkanzelmeyer.alfred.storage;
 
-import com.github.kkanzelmeyer.alfred.IAlfredBridge;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.kkanzelmeyer.alfred.IAlfredBridge;
 
 public enum StorageBridge implements IAlfredBridge {
   INSTANCE;
@@ -18,9 +23,9 @@ public enum StorageBridge implements IAlfredBridge {
   
   public String getFileName() {
     Calendar today = Calendar.getInstance();
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");
     String date = df.format(today.getTime());
-    String filename = "visitor" + date + ".jpg";
+    String filename = "visitor-" + date + ".jpg";
     return filename;
   }
   

@@ -46,11 +46,12 @@ task createImgDir {
     }
 }
 
-task copyTestResources(type: Copy) {
-    from "${projectDir}/src/test/resources"
-    into "${buildDir}/classes/test"
+sourceSets{
+test {
+  resources {
+    srcDir "src/test/resources"
+  }
 }
-processTestResources.dependsOn copyTestResources
 
 distributions {
     main {

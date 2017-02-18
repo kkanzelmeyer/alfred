@@ -1,8 +1,14 @@
 package com.github.kkanzelmeyer.alfred.alert;
 
+import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.kkanzelmeyer.alfred.datastore.Store;
 import com.github.kkanzelmeyer.alfred.storage.ServiceType;
 import com.google.api.client.http.GenericUrl;
+import com.google.api.client.http.HttpContent;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
@@ -11,8 +17,6 @@ import com.google.api.client.http.json.JsonHttpContent;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.Key;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class FirebaseAlert implements IAlertService {
 
@@ -29,29 +33,77 @@ public class FirebaseAlert implements IAlertService {
               (HttpRequest request) -> request.setParser(new JsonObjectParser(new JacksonFactory()))
           );
     }
+    if (Store.INSTANCE.getConfig().fcmServerKey.equals("")) {
+      throw new IllegalStateException(
+          "FCM Server Key has not been set or is not recognized: " + Store.INSTANCE.getConfig().fcmServerKey);
+    }
   }
 
   @Override
   public boolean sendAlert(String imagePath, String msg) {
-    return false;
+    try {
+      String to = Store.INSTANCE.getConfig().deviceTokens.get(0);
+      JsonHttpContent content = createContent(to, imagePath, msg);
+      log.info("content: {}", content.getData());
+      HttpRequest request = createRequest(content);
+      log.info("headers", request.getHeaders());
+      log.info("response: {}", request.execute().parseAsString());
+    } catch (Exception e) {
+      log.error("Error sending firebase alert", e);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * 
+   * @return
+   */
+  private HttpHeaders getHeaders() {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType("application/json");
+    headers.setAuthorization("key=" + Store.INSTANCE.getConfig().fcmServerKey);
+    headers.setAccept("application/json");
+    return headers;
+  }
+
+  /**
+   * 
+   * @param to
+   * @param imagePath
+   * @param msg
+   * @return
+   */
+  private JsonHttpContent createContent(String to, String imagePath, String msg) {
+    JsonHttpContent content = new JsonHttpContent(new JacksonFactory(), new FirebaseNotification(to,
+        new NotificationPayload("New Visitor", "Someone's at the door!", "fcm.ACTION.HELLO"),
+        new DataPayload(imagePath, msg)));
+    return content;
+  }
+
+  /**
+   * 
+   * @param content
+   * @return
+   * @throws IOException
+   */
+  private HttpRequest createRequest(HttpContent content) throws IOException {
+    HttpRequest request = requestFactory.buildPostRequest(new GenericUrl("https://fcm.googleapis.com/fcm/send"),
+        content);
+    log.info(request.toString());
+    HttpHeaders headers = getHeaders();
+    log.info("auth: {}", headers.getAuthorization());
+    request.setHeaders(headers);
+    return request;
   }
 
   @Override
   public boolean sendAlert(String msg) {
     try {
       String to = Store.INSTANCE.getConfig().deviceTokens.get(0);
-      JsonHttpContent content = new JsonHttpContent(
-          new JacksonFactory(), new FirebaseNotification(to, new Noty("yo dawg", "wat", "fcm.ACTION.HELLO")));
+      JsonHttpContent content = createContent(to, null, msg);
       log.info("content: {}", content.getData());
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType("application/json");
-      headers.setAuthorization("key=" + Store.INSTANCE.getConfig().fcmServerKey);
-      headers.setAccept("application/json");
-      log.info("auth: {}", headers.getAuthorization());
-      HttpRequest request = requestFactory.buildPostRequest(
-          new GenericUrl("https://fcm.googleapis.com/fcm/send"), content);
-      log.info(request.toString());
-      request.setHeaders(headers);
+      HttpRequest request = createRequest(content);
       log.info("response: {}", request.execute().parseAsString());
     } catch (Exception e) {
       log.error("Error sending firebase alert", e);
@@ -74,11 +126,15 @@ public class FirebaseAlert implements IAlertService {
     public boolean content_available = true;
 
     @Key
-    public Noty notification;
+    public NotificationPayload notification;
+    
+    @Key
+    public DataPayload data;
 
-    public FirebaseNotification(String to, Noty notification) {
+    public FirebaseNotification(String to, NotificationPayload notification, DataPayload data) {
       this.to = to;
       this.notification = notification;
+      this.data = data;
     }
 
     public String toString() {
@@ -86,28 +142,47 @@ public class FirebaseAlert implements IAlertService {
     }
   }
 
-  public class Noty {
+  public class NotificationPayload {
     @Key
     public String title;
-
+    
     @Key
     public String body;
-
+    
     @Key
     public String sound = "default";
-
+    
     @Key
     public String click_action;
-
-    public Noty(String title, String body, String click) {
+    
+    public NotificationPayload(String title, String body, String click) {
       this.title = title;
       this.body = body;
       this.click_action = click;
     }
-
+    
     @Override
     public String toString() {
       return "\ttitle: " + title + "\n\tbody: " + body;
+    }
+  }
+  
+  public class DataPayload {
+    @Key
+    public String imagePath;
+
+    @Key
+    public String message;
+
+
+    public DataPayload(String path, String msg) {
+      this.imagePath = path;
+      this.message = msg;
+    }
+
+    @Override
+    public String toString() {
+      return "\timagePath: " + imagePath;
     }
   }
 
