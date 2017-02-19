@@ -1,9 +1,8 @@
-apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'application'
 
 group = 'com.github.kkanzelmeyer'
-version = '1.0'
+version = '2.0.0'
 
 description = "alfred"
 
@@ -31,7 +30,7 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.12'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
     compile group: 'ch.qos.logback', name: 'logback-core', version: '1.1.2'
-    compile group: 'com.github.sarxos', name: 'webcam-capture', version: '0.3.12-SNAPSHOT'
+    compile group: 'com.github.sarxos', name: 'webcam-capture', version: '0.3.13'
     compile group: 'com.github.sarxos', name: 'webcam-capture-driver-fswebcam', version: '0.3.10'
     compile group: 'com.github.sarxos', name: 'webcam-capture-driver-v4l4j', version: '0.3.11'
     compile group: 'commons-io', name: 'commons-io', version: '2.4'
@@ -50,8 +49,12 @@ distributions {
     main {
         contents {
             from("src/test/resources") {
-               into "config"
+               into "lib/config"
             }
         }
     }
+}
+
+startScripts {
+    classpath += files("config")
 }

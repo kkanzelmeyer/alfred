@@ -1,5 +1,16 @@
 package com.github.kkanzelmeyer.alfred.plugins;
 
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.kkanzelmeyer.alfred.alert.AlertBridge;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDevice;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceHandler;
@@ -8,14 +19,12 @@ import com.github.kkanzelmeyer.alfred.datamodel.enums.State;
 import com.github.kkanzelmeyer.alfred.datastore.Store;
 import com.github.kkanzelmeyer.alfred.storage.ServiceType;
 import com.github.kkanzelmeyer.alfred.storage.StorageBridge;
-import com.github.sarxos.webcam.*;
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamMotionDetector;
+import com.github.sarxos.webcam.WebcamMotionDetectorDefaultWithDNE;
+import com.github.sarxos.webcam.WebcamMotionEvent;
+import com.github.sarxos.webcam.WebcamMotionListener;
 import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.util.*;
 
 public class WebcamMotionPlugin extends DevicePlugin {
 
@@ -25,22 +34,24 @@ public class WebcamMotionPlugin extends DevicePlugin {
   private Webcam webcam = null;
   private WebcamMotionDetector detector = null;
   private BufferedImage detectionImage = null;
-  // private BufferedImage baselineImage = null;
-  private String detectionImagePath = null;
   private final Logger log = LoggerFactory.getLogger(WebcamMotionPlugin.class);
 
   public WebcamMotionPlugin(StateDevice device) {
     super(device);
-    log.debug("Creating webcam instance");
-    Webcam.setDriver(new V4l4jDriver()); // this is important
-    webcam = Webcam.getDefault();
-    Dimension[] myResolution = new Dimension[] { new Dimension(640, 360), new Dimension(1280, 720) };
-    webcam.setCustomViewSizes(myResolution);
-    webcam.setViewSize(myResolution[0]);
-    // take a throwaway picture to allow the camera to adjust itself
-    webcam.open();
-    webcam.getImage();
-    webcam.close();
+    try {
+      log.debug("Creating webcam instance");
+      Webcam.setDriver(new V4l4jDriver()); // this is important
+      webcam = Webcam.getDefault();
+      Dimension[] myResolution = new Dimension[] { new Dimension(640, 360), new Dimension(1280, 720) };
+      webcam.setCustomViewSizes(myResolution);
+      webcam.setViewSize(myResolution[0]);
+      // take a throwaway picture to allow the camera to adjust itself
+      webcam.open();
+      webcam.getImage();
+      webcam.close();
+    } catch (Exception e) {
+      log.error("Error creating webcam plugin", e);
+    }
   }
 
   @Override
@@ -100,7 +111,6 @@ public class WebcamMotionPlugin extends DevicePlugin {
       StateDevice device = StateDeviceManager.INSTANCE.getDevice(myDeviceId);
       State newState;
       detectionImage = wme.getCurrentImage();
-      detectionImagePath = "";
       Map<ServiceType, String> imagePaths = StorageBridge.INSTANCE.saveImage(detectionImage);
       if (device.getState() == State.INACTIVE) {
         AlertBridge.INSTANCE.sendAlert(imagePaths, area + "<br/>" + threshold + "<br/>" + cog);
