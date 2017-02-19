@@ -1,8 +1,7 @@
 package com.github.kkanzelmeyer.alfred.alert;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -16,41 +15,30 @@ public enum AlertBridge implements IAlfredService {
 
   private Logger logger = LoggerFactory.getLogger(AlertBridge.class);
 
-  private List<IAlertService> alertServices = new ArrayList<>();
+  private Map<ServiceType, IAlertService> alertServices = new HashMap<>();
 
   @Override
   public void setup() {
     if (alertServices.size() == 0) {
-      logger.warn("No storage services added - did you mean to add storage services?");
+      logger.warn("No storage services added - did you mean to add alert services?");
     }
-    for (IAlertService service : alertServices) {
+    for (IAlertService service : alertServices.values()) {
       service.setup();
     }
   }
 
   /**
-   * @param imagePaths
-   * @param msg
-   * @return
+   * 
+   * @param alert
    */
-  public boolean sendAlert(Map<ServiceType, String> imagePaths, String msg) {
-    for (IAlertService service : alertServices) {
-      logger.debug("Sending alert to {}", service.getClass());
-      service.sendAlert(imagePaths.get(service.getType()), msg);
+  public void sendAlert(AlfredAlert alert) {
+    IAlertService service = alertServices.get(alert.getType());
+    if (service == null) {
+      logger.warn("sendAlert - storage type not activated {}", alert.getType());
+      return;
     }
-    return false;
-  }
-
-  /**
-   * @param msg
-   * @return
-   */
-  public boolean sendAlert(String msg) {
-    for (IAlertService service : alertServices) {
-      logger.debug("Sending alert to {}", service.getClass());
-      service.sendAlert(msg);
-    }
-    return false;
+    logger.debug("Sending alert to {}", service.getClass());
+    service.sendAlert(alert.getImagePath(), alert.getMessage());
   }
 
   /**
@@ -68,10 +56,11 @@ public enum AlertBridge implements IAlfredService {
         throw new ClassCastException("Unrecognized storage service: " + instance.getClass().getName());
       }
       IAlertService service = (IAlertService) instance;
-      alertServices.add(service);
+      alertServices.put(service.getType(), service);
     } catch (Exception e) {
       logger.error("Error adding service: " + fqn, e);
     }
   }
+
 
 }

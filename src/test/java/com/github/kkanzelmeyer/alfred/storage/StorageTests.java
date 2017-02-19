@@ -1,11 +1,6 @@
 package com.github.kkanzelmeyer.alfred.storage;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +31,14 @@ public class StorageTests {
       StorageBridge.INSTANCE.setup();
 
       // get test image
-      BufferedImage originalImage = ImageIO
-          .read(new File(classLoader.getResource("kanzelmeyer-software-company.jpg").getFile()));
-      Map<ServiceType, String> result = StorageBridge.INSTANCE.saveImage(originalImage);
-      for (Entry<ServiceType, String> entry : result.entrySet()) {
-        logger.info("{}, {}", entry.getKey(), entry.getValue());
-      }
+      // BufferedImage originalImage = ImageIO
+      // .read(new
+      // File(classLoader.getResource("kanzelmeyer-software-company.jpg").getFile()));
+      // Map<ServiceType, String> result =
+      // StorageBridge.INSTANCE.saveImage(originalImage);
+      // for (Entry<ServiceType, String> entry : result.entrySet()) {
+      // logger.info("{}, {}", entry.getKey(), entry.getValue());
+      // }
     } catch (Exception e) {
       logger.error("error saving file", e);
     }

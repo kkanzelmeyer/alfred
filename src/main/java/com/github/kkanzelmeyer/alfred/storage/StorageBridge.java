@@ -4,10 +4,8 @@ import java.awt.image.BufferedImage;
 import java.lang.reflect.Constructor;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -19,8 +17,14 @@ public enum StorageBridge implements IAlfredBridge {
   INSTANCE;
 
   private final Logger logger = LoggerFactory.getLogger(getDeclaringClass());
-  private List<IStorageService> storageServices = new ArrayList<>();
+  private Map<ServiceType, IStorageService> storageServices = new HashMap<>();
   
+  public String getDate() {
+    Calendar today = Calendar.getInstance();
+    DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    return df.format(today.getTime());
+  }
+
   public String getFileName() {
     Calendar today = Calendar.getInstance();
     DateFormat df = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");
@@ -29,14 +33,24 @@ public enum StorageBridge implements IAlfredBridge {
     return filename;
   }
   
-  public Map<ServiceType, String> saveImage(BufferedImage img) {
-    Map<ServiceType, String> paths = new HashMap<>();
-    for (IStorageService storage : storageServices)
-    {
-      logger.debug("{} saving image", storage.getClass().getSimpleName());
-      paths.put(storage.getType(), storage.saveImage(img));
+  // public Map<ServiceType, String> saveImage(BufferedImage img) {
+  // Map<ServiceType, String> paths = new HashMap<>();
+  // for (IStorageService storage : storageServices)
+  // {
+  // logger.debug("{} saving image", storage.getClass().getSimpleName());
+  // paths.put(storage.getType(), storage.saveImage(img));
+  // }
+  // return paths;
+  // }
+
+  public String saveImage (ServiceType type, BufferedImage img)
+  {
+    IStorageService storage = storageServices.get(type);
+    if (storage == null) {
+      logger.warn("saveImage - storage type not activated {}", type);
+      return null;
     }
-    return paths;
+    return storage.saveImage(img);
   }
 
   @Override
@@ -44,7 +58,7 @@ public enum StorageBridge implements IAlfredBridge {
     if (storageServices.size() == 0) {
       logger.warn("No storage services added - did you mean to add storage services?");
     }
-    for (IStorageService service : storageServices) {
+    for (IStorageService service : storageServices.values()) {
       service.setup();
     }
   }
@@ -63,7 +77,7 @@ public enum StorageBridge implements IAlfredBridge {
         throw new ClassCastException("Unrecognized storage service: " + instance.getClass().getName());
       }
       IStorageService service = (IStorageService) instance;
-      storageServices.add(service);
+      storageServices.put(service.getType(), service);
     } catch (Exception e) {
       logger.error("Error adding service: " + fqn, e);
     }

@@ -48,7 +48,7 @@ public class FirebaseFileStorage implements IStorageService {
       ImageIO.write(img, "jpg", baos);
       byte[] bytes = baos.toByteArray();
       String bucketName = Store.INSTANCE.getConfig().bucket;
-      String filename = StorageBridge.INSTANCE.getFileName();
+      String filename = StorageBridge.INSTANCE.getDate() + "/" + StorageBridge.INSTANCE.getFileName();
       // save in a test directory if its a test environment
       if (Store.INSTANCE.getConfig().environment.equals("development")) {
         filename = "test/" + filename;

@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.kkanzelmeyer.alfred.alert.AlertBridge;
+import com.github.kkanzelmeyer.alfred.alert.AlfredAlert;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDevice;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceHandler;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceManager;
@@ -98,27 +98,37 @@ public class WebcamMotionPlugin extends DevicePlugin {
       log.debug("Motion detected");
       log.debug("Area affected by motion: {}%", wme.getArea());
       log.debug("Motion COG: {}%", wme.getCog());
-      int sum = 0;
-      for (int t : wme.getSource().getThresholds()) {
-        log.trace("Threshold: {}", t);
-        sum += t;
-      }
-      double avgThreshold = sum / wme.getSource().getThresholds().size();
-      log.debug("Average Threshold: {}", avgThreshold);
-      String area = "Area affected by motion: " + wme.getArea();
-      String threshold = "Average threshold: " + avgThreshold;
-      String cog = "Motion COG: " + wme.getCog();
       StateDevice device = StateDeviceManager.INSTANCE.getDevice(myDeviceId);
       State newState;
       detectionImage = wme.getCurrentImage();
-      Map<ServiceType, String> imagePaths = StorageBridge.INSTANCE.saveImage(detectionImage);
+
+      // save every detection instance locally
+      StorageBridge.INSTANCE.saveImage(ServiceType.LOCAL, detectionImage);
+
+      // store remotely and send alert only when the state changes
       if (device.getState() == State.INACTIVE) {
-        AlertBridge.INSTANCE.sendAlert(imagePaths, area + "<br/>" + threshold + "<br/>" + cog);
+        // calculate / get motion metrics
+        int sum = 0;
+        for (int t : wme.getSource().getThresholds()) {
+          log.trace("Threshold: {}", t);
+          sum += t;
+        }
+        double avgThreshold = sum / wme.getSource().getThresholds().size();
+        log.debug("Average Threshold: {}", avgThreshold);
+        String area = "Area affected by motion: " + wme.getArea();
+        String threshold = "Average threshold: " + avgThreshold;
+        String cog = "Motion COG: " + wme.getCog();
+        String message = area + "<br/>" + threshold + "<br/>" + cog;
+        String imagePath = StorageBridge.INSTANCE.saveImage(ServiceType.FIREBASE, detectionImage);
+        AlfredAlert alert = new AlfredAlert.Builder()
+            .setType(ServiceType.FIREBASE)
+            .setMessage(message)
+            .setImagePath(imagePath)
+            .build();
+        AlertBridge.INSTANCE.sendAlert(alert);
         newState = State.ACTIVE;
         StateDeviceManager.INSTANCE.updateStateDevice(myDeviceId, newState);
       }
-      // baselineImage = wme.getPreviousImage();
-      // saveImage(baselineImage);
     }
 
   }
