@@ -132,6 +132,9 @@ public class FirebaseAlert implements IAlertService {
     public String sound = "default";
     
     @Key
+    public String tag = "alfred-visitor";
+
+    @Key
     public String click_action;
     
     public NotificationPayload(String title, String body, String click) {
