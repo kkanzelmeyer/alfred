@@ -11,7 +11,7 @@
     <file>log/alfred.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- daily rollover -->
-      <fileNamePattern>log/alfred.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <fileNamePattern>/home/kevin/Alfred/log/alfred.%d{yyyy-MM-dd}.log</fileNamePattern>
       <!-- keep 30 days' worth of history -->
       <maxHistory>30</maxHistory>
     </rollingPolicy>

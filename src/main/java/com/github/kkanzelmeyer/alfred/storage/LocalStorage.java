@@ -1,15 +1,17 @@
 package com.github.kkanzelmeyer.alfred.storage;
 
-import com.github.kkanzelmeyer.alfred.datastore.Store;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import javax.imageio.ImageIO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.kkanzelmeyer.alfred.datastore.Store;
 
 public class LocalStorage implements IStorageService {
   
@@ -34,7 +36,7 @@ public class LocalStorage implements IStorageService {
       {
         directory.mkdirs();
       }
-      
+
       // Create file
       String filename = StorageBridge.INSTANCE.getFileName();
       File outputfile = new File(directory, filename);

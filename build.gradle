@@ -4,7 +4,7 @@ apply plugin: 'application'
 group = 'com.github.kkanzelmeyer'
 version = '2.0.0'
 
-description = "alfred"
+description = "Alfred: Motion Sensor"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -17,6 +17,7 @@ repositories {
     maven { url "http://repo.maven.apache.org/maven2" }
 }
 
+// add src/test/resources to sources for unit tests
 sourceSets{
   test {
     resources {
@@ -45,16 +46,26 @@ dependencies {
 
 mainClassName = "com.github.kkanzelmeyer.alfred.App"
 
+// copy src/test/resources into distribution `config` folder
 distributions {
     main {
         contents {
             from("src/test/resources") {
-               into "lib/config"
+               into "config"
             }
         }
     }
 }
 
+// customization of startscript
+// this allows to add configuration items to the `config` directory
+// outside of the lib directory
 startScripts {
-    classpath += files("config")
+    classpath = files('$APP_HOME/lib/*', 'config')
+    doLast {
+	    def windowsScriptFile = file getWindowsScript()
+	    def unixScriptFile    = file getUnixScript()
+	    windowsScriptFile.text = windowsScriptFile.text.replace('%APP_HOME%\\lib\\config', '%APP_HOME%\\config')
+	    unixScriptFile.text  = unixScriptFile.text.replace('$APP_HOME/lib/config', '$APP_HOME/config')
+	  }
 }

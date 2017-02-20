@@ -96,21 +96,17 @@ public class WebcamMotionPlugin extends DevicePlugin {
     @Override
     public void motionDetected(WebcamMotionEvent wme) {
       log.debug("Motion detected");
-      log.debug("Area affected by motion: {}%", wme.getArea());
-      log.debug("Motion COG: {}%", wme.getCog());
       StateDevice device = StateDeviceManager.INSTANCE.getDevice(myDeviceId);
       State newState;
       detectionImage = wme.getCurrentImage();
 
-      // save every detection instance locally
-      StorageBridge.INSTANCE.saveImage(ServiceType.LOCAL, detectionImage);
-
       // store remotely and send alert only when the state changes
       if (device.getState() == State.INACTIVE) {
+        String imagePath = StorageBridge.INSTANCE.saveImage(ServiceType.FIREBASE, detectionImage);
+
         // calculate / get motion metrics
         int sum = 0;
         for (int t : wme.getSource().getThresholds()) {
-          log.trace("Threshold: {}", t);
           sum += t;
         }
         double avgThreshold = sum / wme.getSource().getThresholds().size();
@@ -119,7 +115,6 @@ public class WebcamMotionPlugin extends DevicePlugin {
         String threshold = "Average threshold: " + avgThreshold;
         String cog = "Motion COG: " + wme.getCog();
         String message = area + "<br/>" + threshold + "<br/>" + cog;
-        String imagePath = StorageBridge.INSTANCE.saveImage(ServiceType.FIREBASE, detectionImage);
         AlfredAlert alert = new AlfredAlert.Builder()
             .setType(ServiceType.FIREBASE)
             .setMessage(message)
@@ -129,6 +124,12 @@ public class WebcamMotionPlugin extends DevicePlugin {
         newState = State.ACTIVE;
         StateDeviceManager.INSTANCE.updateStateDevice(myDeviceId, newState);
       }
+
+      log.debug("Area affected by motion: {}%", wme.getArea());
+      log.debug("Motion COG: {}%", wme.getCog());
+
+      // save every detection instance locally
+      StorageBridge.INSTANCE.saveImage(ServiceType.LOCAL, detectionImage);
     }
 
   }

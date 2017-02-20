@@ -32,16 +32,6 @@ public enum StorageBridge implements IAlfredBridge {
     String filename = "visitor-" + date + ".jpg";
     return filename;
   }
-  
-  // public Map<ServiceType, String> saveImage(BufferedImage img) {
-  // Map<ServiceType, String> paths = new HashMap<>();
-  // for (IStorageService storage : storageServices)
-  // {
-  // logger.debug("{} saving image", storage.getClass().getSimpleName());
-  // paths.put(storage.getType(), storage.saveImage(img));
-  // }
-  // return paths;
-  // }
 
   public String saveImage (ServiceType type, BufferedImage img)
   {

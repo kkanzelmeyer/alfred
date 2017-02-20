@@ -43,30 +43,62 @@ public class FirebaseFileStorage implements IStorageService {
 
   @Override
   public String saveImage(BufferedImage img) {
-    try {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      ImageIO.write(img, "jpg", baos);
-      byte[] bytes = baos.toByteArray();
-      String bucketName = Store.INSTANCE.getConfig().bucket;
-      String filename = StorageBridge.INSTANCE.getDate() + "/" + StorageBridge.INSTANCE.getFileName();
-      // save in a test directory if its a test environment
-      if (Store.INSTANCE.getConfig().environment.equals("development")) {
-        filename = "test/" + filename;
-      }
-      BlobId blobId = BlobId.of(bucketName, filename);
-      BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/jpeg").build();
-      // create the blob in one request.
-      storage.create(blobInfo, bytes);
-      return filename;
-    } catch (Exception e) {
-      logger.error("error saving file", e);
+    logger.info("saveImage - saving image with firebase");
+    String filename = StorageBridge.INSTANCE.getDate() + "/" + StorageBridge.INSTANCE.getFileName();
+    // save in a test directory if its a test environment
+    if (Store.INSTANCE.getConfig().environment.equals("development")) {
+      filename = "test/" + filename;
     }
-    return null;
+
+    // kick off thread to save the image
+    logger.debug("starting thread for file upload");
+    FirebaseImageUploader uploader = new FirebaseImageUploader(img, filename);
+    Thread uploaderThread = new Thread(uploader);
+    uploaderThread.start();
+    logger.debug("thread started - returning from saveImage");
+
+    // return the filename
+    return filename;
   }
 
   @Override
   public ServiceType getType() {
     return type;
+  }
+
+  /**
+   * Runnable to upload an image to firebase
+   * 
+   * @author kevinkanzelmeyer
+   *
+   */
+  private class FirebaseImageUploader implements Runnable {
+
+    BufferedImage img;
+    String filename;
+
+    public FirebaseImageUploader(BufferedImage img, String filename) {
+      this.img = img;
+      this.filename = filename;
+    }
+
+    @Override
+    public void run() {
+      logger.debug("run - saving image to firebase {}", filename);
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      try {
+        ImageIO.write(img, "jpg", baos);
+      } catch (IOException e) {
+        logger.error("Error saving image :/", e);
+      }
+      byte[] bytes = baos.toByteArray();
+      BlobId blobId = BlobId.of(Store.INSTANCE.getConfig().bucket, filename);
+      BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/jpeg").build();
+      // create the blob in one request.
+      storage.create(blobInfo, bytes);
+      logger.debug("run - done saving image to firebase {}", filename);
+    }
+
   }
 
 }

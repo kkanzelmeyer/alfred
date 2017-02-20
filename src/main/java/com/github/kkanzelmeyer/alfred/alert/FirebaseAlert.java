@@ -41,17 +41,11 @@ public class FirebaseAlert implements IAlertService {
 
   @Override
   public boolean sendAlert(String imagePath, String msg) {
-    try {
-      String to = Store.INSTANCE.getConfig().deviceTokens.get(0);
-      JsonHttpContent content = createContent(to, imagePath, msg);
-      log.info("content: {}", content.getData());
-      HttpRequest request = createRequest(content);
-      log.info("headers", request.getHeaders());
-      log.info("response: {}", request.execute().parseAsString());
-    } catch (Exception e) {
-      log.error("Error sending firebase alert", e);
-      return false;
-    }
+    log.debug("sendAlert - starting thread for firebase alert");
+    FirebaseNotificationSender sender = new FirebaseNotificationSender(imagePath, msg);
+    Thread alertThread = new Thread(sender);
+    alertThread.start();
+    log.debug("sendAlert - thread started, returning");
     return true;
   }
 
@@ -95,21 +89,6 @@ public class FirebaseAlert implements IAlertService {
     log.info("auth: {}", headers.getAuthorization());
     request.setHeaders(headers);
     return request;
-  }
-
-  @Override
-  public boolean sendAlert(String msg) {
-    try {
-      String to = Store.INSTANCE.getConfig().deviceTokens.get(0);
-      JsonHttpContent content = createContent(to, null, msg);
-      log.info("content: {}", content.getData());
-      HttpRequest request = createRequest(content);
-      log.info("response: {}", request.execute().parseAsString());
-    } catch (Exception e) {
-      log.error("Error sending firebase alert", e);
-      return false;
-    }
-    return true;
   }
 
   @Override
@@ -184,6 +163,41 @@ public class FirebaseAlert implements IAlertService {
     public String toString() {
       return "\timagePath: " + imagePath;
     }
+  }
+
+  @Override
+  public boolean sendAlert(String msg) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  private class FirebaseNotificationSender implements Runnable {
+
+    private String imagePath;
+    private String msg;
+
+    public FirebaseNotificationSender(String imgPath, String msg) {
+      this.imagePath = imgPath;
+      this.msg = msg;
+    }
+
+    @Override
+    public void run() {
+      try {
+        log.debug("run - sending alert for image {}", imagePath);
+        String to = Store.INSTANCE.getConfig().deviceTokens.get(0);
+        JsonHttpContent content = createContent(to, imagePath, msg);
+        log.trace("content: {}", content.getData());
+        HttpRequest request = createRequest(content);
+        log.trace("headers", request.getHeaders());
+        String response = request.execute().parseAsString();
+        log.trace("response: {}", response);
+        log.debug("finished");
+      } catch (Exception e) {
+        log.error("Error sending firebase alert", e);
+      }
+    }
+
   }
 
 }
