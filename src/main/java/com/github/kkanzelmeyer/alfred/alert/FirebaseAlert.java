@@ -70,7 +70,7 @@ public class FirebaseAlert implements IAlertService {
    */
   private JsonHttpContent createContent(String to, String imagePath, String msg) {
     JsonHttpContent content = new JsonHttpContent(new JacksonFactory(), new FirebaseNotification(to,
-        new NotificationPayload("New Visitor", "Someone's at the door!", "fcm.ACTION.HELLO"),
+        new NotificationPayload("New Visitor", "Someone's at the door!", "fcm.ACTION.VISITOR"),
         new DataPayload(imagePath, msg)));
     return content;
   }
