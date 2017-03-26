@@ -1,12 +1,17 @@
 package com.github.kkanzelmeyer.alfred.server;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+
+import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.github.kkanzelmeyer.alfred.alert.AlertBridge;
+import com.github.kkanzelmeyer.alfred.alert.AlfredAlert;
 import com.github.kkanzelmeyer.alfred.datastore.Store;
+import com.github.kkanzelmeyer.alfred.storage.ServiceType;
 import com.github.kkanzelmeyer.alfred.storage.StorageBridge;
 import com.github.kkanzelmeyer.alfred.storage.StorageTests;
 
@@ -43,15 +48,16 @@ public class ServerTests
       AlertBridge.INSTANCE.setup();
 
       // get test image
-      // BufferedImage originalImage = ImageIO
-      // .read(new
-      // File(classLoader.getResource("kanzelmeyer-software-company.jpg").getFile()));
-      // Map<ServiceType, String> result =
-      // StorageBridge.INSTANCE.saveImage(originalImage);
-      // for (Entry<ServiceType, String> entry : result.entrySet()) {
-      // LOG.info("{}, {}", entry.getKey(), entry.getValue());
-      // }
-      // AlertBridge.INSTANCE.sendAlert(result, "yo dawg");
+      BufferedImage originalImage = ImageIO
+          .read(new File(classLoader.getResource("kanzelmeyer-software-company.jpg").getFile()));
+      String imagePath = StorageBridge.INSTANCE.saveImage(ServiceType.FIREBASE, originalImage);
+
+      AlfredAlert alert = new AlfredAlert.Builder()
+          .setType(ServiceType.FIREBASE)
+          .setMessage("yo dawg")
+          .setImagePath(imagePath)
+          .build();
+      AlertBridge.INSTANCE.sendAlert(alert);
     } catch (Exception e) {
       LOG.error("Error saving or sending", e);
     }

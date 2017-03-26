@@ -1,4 +1,5 @@
 config.json
+config.raspi.json
 target/
 .project
 .settings/

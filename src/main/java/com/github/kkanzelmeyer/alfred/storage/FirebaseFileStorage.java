@@ -44,7 +44,7 @@ public class FirebaseFileStorage implements IStorageService {
   @Override
   public String saveImage(BufferedImage img) {
     logger.info("saveImage - saving image with firebase");
-    String filename = StorageBridge.INSTANCE.getDate() + "/" + StorageBridge.INSTANCE.getFileName();
+    String filename = "visitors/" + StorageBridge.INSTANCE.getDate() + "/" + StorageBridge.INSTANCE.getFileName();
     // save in a test directory if its a test environment
     if (Store.INSTANCE.getConfig().environment.equals("development")) {
       filename = "test/" + filename;
