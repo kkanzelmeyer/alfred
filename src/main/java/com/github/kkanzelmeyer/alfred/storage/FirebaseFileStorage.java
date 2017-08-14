@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -52,10 +54,16 @@ public class FirebaseFileStorage implements IStorageService {
       logger.info("setting up firebase database");
       FirebaseOptions options;
       FileInputStream serviceAccount = new FileInputStream(Store.INSTANCE.getConfig().authFilePath);
+      Map<String, Object> auth = new HashMap<String, Object>();
+      auth.put("uid", "rHn4DWQ05wUXtUj2oTAFrMPAJrJ2");
       options = new FirebaseOptions.Builder()
           .setCredential(FirebaseCredentials.fromCertificate(serviceAccount))
+          .setDatabaseAuthVariableOverride(auth)
           .setDatabaseUrl("https://" + Store.INSTANCE.getConfig().projectId + ".firebaseio.com/")
           .build();
+      for (Map.Entry<String, Object> entry : options.getDatabaseAuthVariableOverride().entrySet()) {
+        logger.info("auth variable override: {}, {}", entry.getKey(), entry.getValue());
+      }
       FirebaseApp.initializeApp(options);
       dbRef = FirebaseDatabase.getInstance().getReference();
       logger.info("Firebase database ref successful - {}", dbRef);
@@ -109,6 +117,7 @@ public class FirebaseFileStorage implements IStorageService {
     public void run() {
       uploadImage();
       saveFileMetaData();
+      logger.info("save image thread finished");
     }
 
     private void uploadImage() {
@@ -124,14 +133,18 @@ public class FirebaseFileStorage implements IStorageService {
       BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("image/jpeg").build();
       // create the blob in one request.
       storage.create(blobInfo, bytes);
-      logger.debug("run - done saving image to firebase {}", filename);
+      logger.debug("done saving image to firebase {}", filename);
     }
 
     private void saveFileMetaData() {
-      DatabaseReference visitorFilesRef = dbRef.child("visitorFiles");
-      DatabaseReference newEntry = visitorFilesRef.push();
-      newEntry.setValue(filename);
-      logger.info("saved file name to firebase database location {}", newEntry);
+      try {
+        DatabaseReference visitorFilesRef = dbRef.child("visitorFiles");
+        DatabaseReference newEntry = visitorFilesRef.push();
+        newEntry.setValue(filename);
+        logger.info("saved file name to firebase database location {}", newEntry);
+      } catch (Exception e) {
+        logger.error("There was an error writing the filename to the database");
+      }
     }
 
   }
