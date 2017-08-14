@@ -18,15 +18,22 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.auth.FirebaseCredentials;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class FirebaseFileStorage implements IStorageService {
 
   private final Logger logger = LoggerFactory.getLogger(FirebaseFileStorage.class);
   private final ServiceType type = ServiceType.FIREBASE;
   private Storage storage = null;
+  private DatabaseReference dbRef = null;
 
   @Override
   public void setup() {
+    // set up cloud storage
     File file = new File(Store.INSTANCE.getConfig().authFilePath);
     logger.info("setup - setting up firebase file storage with config : {}", file.getAbsolutePath());
     InputStream inputStream;
@@ -38,6 +45,22 @@ public class FirebaseFileStorage implements IStorageService {
           .build().getService();
     } catch (IOException e) {
       logger.error("error reading auth file", e);
+    }
+
+    // set up database storage
+    try {
+      logger.info("setting up firebase database");
+      FirebaseOptions options;
+      FileInputStream serviceAccount = new FileInputStream(Store.INSTANCE.getConfig().authFilePath);
+      options = new FirebaseOptions.Builder()
+          .setCredential(FirebaseCredentials.fromCertificate(serviceAccount))
+          .setDatabaseUrl("https://" + Store.INSTANCE.getConfig().projectId + ".firebaseio.com/")
+          .build();
+      FirebaseApp.initializeApp(options);
+      dbRef = FirebaseDatabase.getInstance().getReference();
+      logger.info("Firebase database ref successful - {}", dbRef);
+    } catch (Exception e) {
+      logger.error("error initializing firebase database");
     }
   }
 
@@ -84,6 +107,11 @@ public class FirebaseFileStorage implements IStorageService {
 
     @Override
     public void run() {
+      uploadImage();
+      saveFileMetaData();
+    }
+
+    private void uploadImage() {
       logger.debug("run - saving image to firebase {}", filename);
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       try {
@@ -97,6 +125,10 @@ public class FirebaseFileStorage implements IStorageService {
       // create the blob in one request.
       storage.create(blobInfo, bytes);
       logger.debug("run - done saving image to firebase {}", filename);
+    }
+
+    private void saveFileMetaData() {
+
     }
 
   }

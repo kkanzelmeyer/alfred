@@ -14,7 +14,7 @@ import com.github.kkanzelmeyer.alfred.server.Config;
 public class StorageTests {
   private static Logger logger = LoggerFactory.getLogger(StorageTests.class);
 
-  public static void main() {
+  public static void main(String[] args) {
     try {
       // load the api key
       ClassLoader classLoader = StorageTests.class.getClassLoader();
