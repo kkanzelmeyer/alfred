@@ -129,6 +129,9 @@ public class FirebaseFileStorage implements IStorageService {
 
     private void saveFileMetaData() {
       DatabaseReference visitorFilesRef = dbRef.child("visitorFiles");
+      DatabaseReference newEntry = visitorFilesRef.push();
+      newEntry.setValue(filename);
+      logger.info("saved file name to firebase database location {}", newEntry);
     }
 
   }
