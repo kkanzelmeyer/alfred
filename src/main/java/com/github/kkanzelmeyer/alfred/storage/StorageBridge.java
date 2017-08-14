@@ -26,10 +26,8 @@ public enum StorageBridge implements IAlfredBridge {
   }
 
   public String getFileName() {
-    Calendar today = Calendar.getInstance();
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");
-    String date = df.format(today.getTime());
-    String filename = "visitor-" + date + ".jpg";
+    String date = String.valueOf(System.currentTimeMillis());
+    String filename = date + ".jpg";
     return filename;
   }
 
