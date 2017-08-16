@@ -55,7 +55,7 @@ public class FirebaseFileStorage implements IStorageService {
       FirebaseOptions options;
       FileInputStream serviceAccount = new FileInputStream(Store.INSTANCE.getConfig().authFilePath);
       Map<String, Object> auth = new HashMap<String, Object>();
-      auth.put("uid", "rHn4DWQ05wUXtUj2oTAFrMPAJrJ2");
+      auth.put("uid", "alfred-door-monitor");
       options = new FirebaseOptions.Builder()
           .setCredential(FirebaseCredentials.fromCertificate(serviceAccount))
           .setDatabaseAuthVariableOverride(auth)
