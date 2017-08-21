@@ -116,7 +116,6 @@ public class FirebaseFileStorage implements IStorageService {
     @Override
     public void run() {
       uploadImage();
-      saveFileMetaData();
       logger.info("save image thread finished");
     }
 
@@ -134,17 +133,6 @@ public class FirebaseFileStorage implements IStorageService {
       // create the blob in one request.
       storage.create(blobInfo, bytes);
       logger.debug("done saving image to firebase {}", filename);
-    }
-
-    private void saveFileMetaData() {
-      try {
-        DatabaseReference visitorFilesRef = dbRef.child("visitorFiles");
-        DatabaseReference newEntry = visitorFilesRef.push();
-        newEntry.setValue(filename);
-        logger.info("saved file name to firebase database location {}", newEntry);
-      } catch (Exception e) {
-        logger.error("There was an error writing the filename to the database");
-      }
     }
 
   }

@@ -20,7 +20,7 @@ public enum AlertBridge implements IAlfredService {
   @Override
   public void setup() {
     if (alertServices.size() == 0) {
-      logger.warn("No storage services added - did you mean to add alert services?");
+      logger.warn("No alert services added - did you mean to add alert services?");
     }
     for (IAlertService service : alertServices.values()) {
       service.setup();

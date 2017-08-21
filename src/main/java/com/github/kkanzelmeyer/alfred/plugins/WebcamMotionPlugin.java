@@ -10,8 +10,6 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.kkanzelmeyer.alfred.alert.AlertBridge;
-import com.github.kkanzelmeyer.alfred.alert.AlfredAlert;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDevice;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceHandler;
 import com.github.kkanzelmeyer.alfred.datamodel.StateDeviceManager;
@@ -102,7 +100,9 @@ public class WebcamMotionPlugin extends DevicePlugin {
 
       // store remotely and send alert only when the state changes
       if (device.getState() == State.INACTIVE) {
-        String imagePath = StorageBridge.INSTANCE.saveImage(ServiceType.FIREBASE, detectionImage);
+        // String imagePath =
+        // StorageBridge.INSTANCE.saveImage(ServiceType.FIREBASE,
+        // detectionImage);
 
         // calculate / get motion metrics
         int sum = 0;
@@ -111,16 +111,16 @@ public class WebcamMotionPlugin extends DevicePlugin {
         }
         double avgThreshold = sum / wme.getSource().getThresholds().size();
         log.debug("Average Threshold: {}", avgThreshold);
-        String area = "Area affected by motion: " + wme.getArea();
-        String threshold = "Average threshold: " + avgThreshold;
-        String cog = "Motion COG: " + wme.getCog();
-        String message = area + "<br/>" + threshold + "<br/>" + cog;
-        AlfredAlert alert = new AlfredAlert.Builder()
-            .setType(ServiceType.FIREBASE)
-            .setMessage(message)
-            .setImagePath(imagePath)
-            .build();
-        AlertBridge.INSTANCE.sendAlert(alert);
+        // String area = "Area affected by motion: " + wme.getArea();
+        // String threshold = "Average threshold: " + avgThreshold;
+        // String cog = "Motion COG: " + wme.getCog();
+        // String message = area + "<br/>" + threshold + "<br/>" + cog;
+        // AlfredAlert alert = new AlfredAlert.Builder()
+        // .setType(ServiceType.FIREBASE)
+        // .setMessage(message)
+        // .setImagePath(imagePath)
+        // .build();
+        // AlertBridge.INSTANCE.sendAlert(alert);
         newState = State.ACTIVE;
         StateDeviceManager.INSTANCE.updateStateDevice(myDeviceId, newState);
       }
