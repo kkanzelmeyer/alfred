@@ -2,7 +2,7 @@ apply plugin: 'maven'
 apply plugin: 'application'
 
 group = 'com.github.kkanzelmeyer'
-version = '2.0.0'
+version = '2.1.0'
 
 description = "Alfred: Motion Sensor"
 
