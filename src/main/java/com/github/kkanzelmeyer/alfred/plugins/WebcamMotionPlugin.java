@@ -100,9 +100,9 @@ public class WebcamMotionPlugin extends DevicePlugin {
 
       // store remotely and send alert only when the state changes
       if (device.getState() == State.INACTIVE) {
-        // String imagePath =
-        // StorageBridge.INSTANCE.saveImage(ServiceType.FIREBASE,
-        // detectionImage);
+        String imagePath =
+        StorageBridge.INSTANCE.saveImage(ServiceType.FIREBASE,
+            detectionImage);
 
         // calculate / get motion metrics
         int sum = 0;

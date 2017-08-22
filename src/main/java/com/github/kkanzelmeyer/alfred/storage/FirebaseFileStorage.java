@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -20,11 +18,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
-import com.google.firebase.auth.FirebaseCredentials;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class FirebaseFileStorage implements IStorageService {
 
@@ -50,26 +44,30 @@ public class FirebaseFileStorage implements IStorageService {
     }
 
     // set up database storage
-    try {
-      logger.info("setting up firebase database");
-      FirebaseOptions options;
-      FileInputStream serviceAccount = new FileInputStream(Store.INSTANCE.getConfig().authFilePath);
-      Map<String, Object> auth = new HashMap<String, Object>();
-      auth.put("uid", "alfred-door-monitor");
-      options = new FirebaseOptions.Builder()
-          .setCredential(FirebaseCredentials.fromCertificate(serviceAccount))
-          .setDatabaseAuthVariableOverride(auth)
-          .setDatabaseUrl("https://" + Store.INSTANCE.getConfig().projectId + ".firebaseio.com/")
-          .build();
-      for (Map.Entry<String, Object> entry : options.getDatabaseAuthVariableOverride().entrySet()) {
-        logger.info("auth variable override: {}, {}", entry.getKey(), entry.getValue());
-      }
-      FirebaseApp.initializeApp(options);
-      dbRef = FirebaseDatabase.getInstance().getReference();
-      logger.info("Firebase database ref successful - {}", dbRef);
-    } catch (Exception e) {
-      logger.error("error initializing firebase database");
-    }
+    // try {
+    // logger.info("setting up firebase storage");
+    // FirebaseOptions options;
+    // FileInputStream serviceAccount = new
+    // FileInputStream(Store.INSTANCE.getConfig().authFilePath);
+    // Map<String, Object> auth = new HashMap<String, Object>();
+    // auth.put("uid", "alfred-door-monitor");
+    // options = new FirebaseOptions.Builder()
+    // .setCredential(FirebaseCredentials.fromCertificate(serviceAccount))
+    // .setDatabaseAuthVariableOverride(auth)
+    // .setDatabaseUrl("https://" + Store.INSTANCE.getConfig().projectId +
+    // ".firebaseio.com/")
+    // .build();
+    // for (Map.Entry<String, Object> entry :
+    // options.getDatabaseAuthVariableOverride().entrySet()) {
+    // logger.info("auth variable override: {}, {}", entry.getKey(),
+    // entry.getValue());
+    // }
+    // FirebaseApp.initializeApp(options);
+    // dbRef = FirebaseDatabase.getInstance().getReference();
+    // logger.info("Firebase database ref successful - {}", dbRef);
+    // } catch (Exception e) {
+    // logger.error("error initializing firebase database");
+    // }
   }
 
   @Override
